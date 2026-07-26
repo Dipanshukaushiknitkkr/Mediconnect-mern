@@ -20,6 +20,41 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// @desc    Delete a user account (Patient or Doctor)
+// @route   DELETE /api/v1/admin/users/:id
+// @access  Private (Admin)
+const deleteUserAccount = async (req, res) => {
+  try {
+    if (req.user._id.toString() === req.params.id) {
+      return res.status(400).json({ success: false, message: 'You cannot delete your own admin account.' });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      global.memoryStore.users = (global.memoryStore.users || []).filter((u) => u._id !== req.params.id);
+      global.memoryStore.doctors = (global.memoryStore.doctors || []).filter(
+        (d) => (d.user?._id || d.user)?.toString() !== req.params.id
+      );
+      return res.json({ success: true, message: 'User account deleted successfully.' });
+    }
+
+    const userToDelete = await User.findById(req.params.id);
+    if (!userToDelete) {
+      return res.status(404).json({ success: false, message: 'User account not found.' });
+    }
+
+    // If deleting a doctor, also remove their doctor profile
+    if (userToDelete.role === 'DOCTOR') {
+      await DoctorProfile.deleteOne({ user: userToDelete._id });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({ success: true, message: `User account '${userToDelete.email}' deleted successfully.` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Get pending doctor approval applications
 // @route   GET /api/v1/admin/doctors/pending
 // @access  Private (Admin)
@@ -54,32 +89,6 @@ const verifyDoctor = async (req, res) => {
     if (!profile) return res.status(404).json({ success: false, message: 'Doctor application not found' });
 
     res.json({ success: true, message: `Doctor status updated to ${status}`, profile });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// @desc    Promote or update user role
-// @route   PATCH /api/v1/admin/users/:id/role
-// @access  Private (Admin)
-const promoteUserRole = async (req, res) => {
-  try {
-    const { role } = req.body;
-    if (!['PATIENT', 'DOCTOR', 'ADMIN'].includes(role)) {
-      return res.status(400).json({ success: false, message: 'Invalid role specified' });
-    }
-
-    if (mongoose.connection.readyState !== 1) {
-      const user = global.memoryStore?.users.find((u) => u._id === req.params.id);
-      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-      user.role = role;
-      return res.json({ success: true, message: `User role updated to ${role}`, user: { _id: user._id, name: user.name, email: user.email, role: user.role } });
-    }
-
-    const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true }).select('-password');
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
-    res.json({ success: true, message: `User '${user.email}' role updated to ${role}`, user });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -125,4 +134,4 @@ const getAdminStats = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getPendingDoctors, verifyDoctor, promoteUserRole, getAdminStats };
+module.exports = { getAllUsers, deleteUserAccount, getPendingDoctors, verifyDoctor, getAdminStats };

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { ShieldCheck, Users, Stethoscope, DollarSign, Calendar, CheckCircle2, XCircle, Loader2, Activity, Search, Edit3, UserCheck, ShieldAlert } from 'lucide-react';
+import { ShieldCheck, Users, Stethoscope, DollarSign, Calendar, CheckCircle2, XCircle, Loader2, Activity, Search, Trash2, ShieldAlert } from 'lucide-react';
 
 const AdminDashboard = () => {
+  const { user: currentAdmin } = useAuth();
   const toast = useToast();
   const [activeTab, setActiveTab] = useState('analytics');
   const [stats, setStats] = useState(null);
@@ -11,7 +13,7 @@ const AdminDashboard = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-  const [updatingRoleUserId, setUpdatingRoleUserId] = useState(null);
+  const [deletingUserId, setDeletingUserId] = useState(null);
 
   useEffect(() => {
     fetchAdminData();
@@ -49,18 +51,22 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleRoleChange = async (userId, newRole) => {
+  const handleDeleteUser = async (userId, userEmail, userName) => {
+    if (!window.confirm(`Are you sure you want to permanently delete user account '${userName}' (${userEmail})? This action cannot be undone.`)) {
+      return;
+    }
+
     try {
-      setUpdatingRoleUserId(userId);
-      const res = await API.patch(`/admin/users/${userId}/role`, { role: newRole });
+      setDeletingUserId(userId);
+      const res = await API.delete(`/admin/users/${userId}`);
       if (res.data.success) {
-        toast.success(`User role updated to ${newRole}!`);
+        toast.success(`Account '${userName}' deleted successfully.`);
         fetchAdminData();
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update user role.');
+      toast.error(err.response?.data?.message || 'Failed to delete user account.');
     } finally {
-      setUpdatingRoleUserId(null);
+      setDeletingUserId(null);
     }
   };
 
@@ -81,7 +87,7 @@ const AdminDashboard = () => {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Super-Admin Control Center</h1>
-            <p className="text-xs sm:text-sm text-slate-400">Master management • Revenue analytics • Doctor licensing verification • User directory</p>
+            <p className="text-xs sm:text-sm text-slate-400">Master management • Revenue analytics • Doctor licensing verification • Account deletion control</p>
           </div>
         </div>
 
@@ -121,7 +127,7 @@ const AdminDashboard = () => {
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>User Directory ({allUsers.length})</span>
+          <span>User & Account Management ({allUsers.length})</span>
         </button>
       </div>
 
@@ -227,20 +233,20 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* TAB 3: USER DIRECTORY & ROLE PROMOTION */}
+      {/* TAB 3: USER ACCOUNT MANAGEMENT & DELETION */}
       {activeTab === 'users' && (
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h3 className="text-lg font-extrabold text-white flex items-center space-x-2">
               <Users className="w-5 h-5 text-blue-400" />
-              <span>User Directory & Permission Roles</span>
+              <span>User & Account Management</span>
             </h3>
 
             <div className="relative max-w-sm w-full">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
                 type="text"
-                placeholder="Search user name or email..."
+                placeholder="Search user by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
@@ -259,30 +265,35 @@ const AdminDashboard = () => {
                       className="w-10 h-10 rounded-xl object-cover ring-2 ring-slate-700"
                     />
                     <div>
-                      <h4 className="font-bold text-white text-sm">{u.name}</h4>
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-bold text-white text-sm">{u.name}</h4>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
+                          u.role === 'ADMIN' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                          u.role === 'DOCTOR' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                          'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                        }`}>
+                          {u.role}
+                        </span>
+                      </div>
                       <p className="text-xs text-slate-400">{u.email}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-3">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
-                      u.role === 'ADMIN' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                      u.role === 'DOCTOR' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                      'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                    }`}>
-                      {u.role}
-                    </span>
-
-                    <select
-                      value={u.role}
-                      disabled={updatingRoleUserId === u._id}
-                      onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                      className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none"
-                    >
-                      <option value="PATIENT">PATIENT</option>
-                      <option value="DOCTOR">DOCTOR</option>
-                      <option value="ADMIN">ADMIN</option>
-                    </select>
+                    {u._id !== currentAdmin?._id ? (
+                      <button
+                        disabled={deletingUserId === u._id}
+                        onClick={() => handleDeleteUser(u._id, u.email, u.name)}
+                        className="px-3.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-600/30 text-red-300 border border-red-500/30 text-xs font-bold flex items-center space-x-1.5 transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete Account</span>
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-slate-500 font-bold px-3 py-1 bg-slate-900 rounded-xl border border-slate-800">
+                        Current Admin Session
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -290,7 +301,7 @@ const AdminDashboard = () => {
           ) : (
             <div className="text-center py-12 glass-panel rounded-3xl border-slate-800">
               <Users className="w-12 h-12 text-slate-500 mx-auto mb-2" />
-              <p className="text-xs text-slate-400">No users found matching your search.</p>
+              <p className="text-xs text-slate-400">No user accounts match your search.</p>
             </div>
           )}
         </div>

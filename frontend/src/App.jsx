@@ -73,11 +73,15 @@ const App = () => {
                   </Routes>
                 </div>
 
-                {/* Footer */}
+                {/* Elegant Professional Medical Footer */}
                 <footer className="glass-panel border-t border-slate-800 py-8 text-center text-xs text-slate-400">
                   <div className="max-w-7xl mx-auto px-4 space-y-2">
-                    <p className="font-semibold text-slate-300">MediConnect Telehealth & AI Platform • Enterprise Placement Edition</p>
-                    <p>Built with Node.js, Express, React, MongoDB Atlas, Socket.io, WebRTC, and Google Gemini AI API.</p>
+                    <p className="font-medium text-slate-300 italic text-sm">
+                      "Wherever the art of Medicine is loved, there is also a love of Humanity." — Hippocrates
+                    </p>
+                    <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">
+                      © {new Date().getFullYear()} MediConnect Telehealth • Compassionate Care & Advanced Clinical Intelligence
+                    </p>
                   </div>
                 </footer>
 
