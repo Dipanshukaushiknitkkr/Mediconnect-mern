@@ -3,8 +3,25 @@ const DoctorProfile = require('../models/DoctorProfile');
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 
+// @desc    Get all registered users for admin management
+// @route   GET /api/v1/admin/users
+// @access  Private (Admin)
+const getAllUsers = async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      const list = global.memoryStore?.users || [];
+      return res.json({ success: true, count: list.length, users: list });
+    }
+
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    res.json({ success: true, count: users.length, users });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Get pending doctor approval applications
-// @route   GET /api/admin/doctors/pending
+// @route   GET /api/v1/admin/doctors/pending
 // @access  Private (Admin)
 const getPendingDoctors = async (req, res) => {
   try {
@@ -21,7 +38,7 @@ const getPendingDoctors = async (req, res) => {
 };
 
 // @desc    Approve or reject doctor application
-// @route   PATCH /api/admin/doctors/:id/verify
+// @route   PATCH /api/v1/admin/doctors/:id/verify
 // @access  Private (Admin)
 const verifyDoctor = async (req, res) => {
   try {
@@ -42,8 +59,8 @@ const verifyDoctor = async (req, res) => {
   }
 };
 
-// @desc    Promote or update user role (Admin self-serve promotion)
-// @route   PATCH /api/admin/users/:id/role
+// @desc    Promote or update user role
+// @route   PATCH /api/v1/admin/users/:id/role
 // @access  Private (Admin)
 const promoteUserRole = async (req, res) => {
   try {
@@ -69,7 +86,7 @@ const promoteUserRole = async (req, res) => {
 };
 
 // @desc    Get platform administrative analytics & stats
-// @route   GET /api/admin/stats
+// @route   GET /api/v1/admin/stats
 // @access  Private (Admin)
 const getAdminStats = async (req, res) => {
   try {
@@ -108,4 +125,4 @@ const getAdminStats = async (req, res) => {
   }
 };
 
-module.exports = { getPendingDoctors, verifyDoctor, promoteUserRole, getAdminStats };
+module.exports = { getAllUsers, getPendingDoctors, verifyDoctor, promoteUserRole, getAdminStats };
