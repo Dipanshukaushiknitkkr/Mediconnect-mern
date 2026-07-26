@@ -99,7 +99,7 @@ const LandingPage = () => {
               </span>
               <span className="flex items-center space-x-1.5">
                 <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                <span>Gemini 2.0 AI</span>
+                <span>Med AI Triage</span>
               </span>
             </div>
 
@@ -172,7 +172,7 @@ const LandingPage = () => {
                   <span>Med AI Symptom Triage</span>
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Describe symptoms to Google Gemini 2.0 AI for instant clinical triage, priority level assessment, and doctor matching.
+                  Describe symptoms to Med AI for instant clinical triage, priority level assessment, and doctor matching.
                 </p>
               </div>
             </div>

@@ -62,7 +62,7 @@ const AISymptomModal = ({ isOpen, onClose, onSelectDoctor }) => {
             <Sparkles className="w-6 h-6 animate-pulse" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white">Google Gemini AI Symptom Assistant</h3>
+            <h3 className="text-xl font-bold text-white">Med AI Symptom Assistant</h3>
             <p className="text-xs text-slate-400">Instant clinical triage & doctor specialization recommendation</p>
           </div>
         </div>
@@ -109,7 +109,7 @@ const AISymptomModal = ({ isOpen, onClose, onSelectDoctor }) => {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Analyzing Symptoms with Gemini AI...</span>
+                <span>Analyzing Symptoms with Med AI...</span>
               </>
             ) : (
               <>
@@ -140,7 +140,7 @@ const AISymptomModal = ({ isOpen, onClose, onSelectDoctor }) => {
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                <p className="text-sm text-slate-200 leading-relaxed"><span className="font-semibold text-purple-300">AI Assessment: </span>{result.triage.summary}</p>
+                <p className="text-sm text-slate-200 leading-relaxed"><span className="font-semibold text-purple-300">Med AI Assessment: </span>{result.triage.summary}</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-start space-x-3">

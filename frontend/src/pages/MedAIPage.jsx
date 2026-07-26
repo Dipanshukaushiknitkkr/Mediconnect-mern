@@ -53,7 +53,7 @@ const MedAIPage = () => {
 
         <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30 text-xs font-bold">
           <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-          <span>Google Gemini 2.0 Medical Intelligence</span>
+          <span>Med AI Clinical Intelligence</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
@@ -215,6 +215,11 @@ const MedAIPage = () => {
           onClose={() => setBookingDoctor(null)}
         />
       )}
+
+      {/* Footer Disclaimer */}
+      <div className="text-center p-4 glass-panel rounded-2xl border-slate-800 text-[11px] text-slate-400">
+        <p>⚡ Powered by <strong className="text-purple-300">Med AI Clinical Triage Engine</strong>. For medical emergencies, please call local emergency services immediately.</p>
+      </div>
 
     </div>
   );
