@@ -7,10 +7,14 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_SOCKET_URL ||
-      (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5000');
+    const getBackendUrl = () => {
+      if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
+      if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL.replace(/\/api.*$/, '');
+      if (typeof window !== 'undefined' && window.location.origin) return window.location.origin;
+      return 'http://localhost:5000';
+    };
 
-    const newSocket = io(backendUrl, {
+    const newSocket = io(getBackendUrl(), {
       autoConnect: false,
       transports: ['websocket', 'polling']
     });
