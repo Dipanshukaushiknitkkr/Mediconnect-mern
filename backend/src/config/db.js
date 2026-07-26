@@ -11,7 +11,8 @@ try {
 const connectDB = async () => {
   try {
     mongoose.set('bufferCommands', false);
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/mediconnect', {
+    const dbUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mediconnect';
+    const conn = await mongoose.connect(dbUri, {
       serverSelectionTimeoutMS: 5000
     });
     console.log(`[Database] MongoDB Atlas Connected Successfully: ${conn.connection.host}`);
