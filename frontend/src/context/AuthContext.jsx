@@ -56,12 +56,22 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     const res = await API.post('/auth/register', formData);
+    return res.data;
+  };
+
+  const verifyOtp = async (email, otp) => {
+    const res = await API.post('/auth/verify-otp', { email, otp });
     if (res.data.success) {
       localStorage.setItem('token', res.data.token);
       setToken(res.data.token);
       setUser(res.data.user);
       connectUserSocket(res.data.token, res.data.user.name);
     }
+    return res.data;
+  };
+
+  const resendOtp = async (email) => {
+    const res = await API.post('/auth/resend-otp', { email });
     return res.data;
   };
 
@@ -75,7 +85,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, fetchMe }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, verifyOtp, resendOtp, logout, fetchMe }}>
       {children}
     </AuthContext.Provider>
   );
