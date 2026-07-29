@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const DoctorProfile = require('../models/DoctorProfile');
-const { sendOtpEmail } = require('../services/emailService');
 
 const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET;
@@ -20,7 +19,7 @@ const generateToken = (id) => {
   return jwt.sign({ id }, getJwtSecret(), { expiresIn: '30d' });
 };
 
-// @desc    Register a new patient or doctor (Sends 6-Digit Email OTP)
+// @desc    Register a new patient or doctor
 // @route   POST /api/v1/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
@@ -45,8 +44,6 @@ const registerUser = async (req, res) => {
     }
 
     const userRole = role === 'DOCTOR' ? 'DOCTOR' : 'PATIENT';
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
     if (mongoose.connection.readyState !== 1) {
       if (!global.memoryStore) global.memoryStore = { users: [], doctors: [] };
@@ -66,15 +63,14 @@ const registerUser = async (req, res) => {
         bloodGroup: 'O+',
         allergies: 'None',
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
-        isEmailVerified: false,
-        emailOtp: otp,
-        emailOtpExpires: otpExpires
+        isEmailVerified: true
       };
 
       global.memoryStore.users.push(user);
 
+      let doctorProfile = null;
       if (userRole === 'DOCTOR') {
-        const doctorProfile = {
+        doctorProfile = {
           _id: 'doc-' + Date.now(),
           user,
           specialty: specialty || 'General Physician',
@@ -91,14 +87,11 @@ const registerUser = async (req, res) => {
         global.memoryStore.doctors.push(doctorProfile);
       }
 
-      await sendOtpEmail(normalizedEmail, otp, name.trim());
-
+      const token = generateToken(user._id);
       return res.status(201).json({
         success: true,
-        requiresOtp: true,
-        email: normalizedEmail,
-        message: 'Registration successful! Please enter the 6-digit OTP code.',
-        otpPreview: otp
+        token,
+        user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, doctorProfile }
       });
     }
 
@@ -113,13 +106,12 @@ const registerUser = async (req, res) => {
       password,
       role: userRole,
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
-      isEmailVerified: false,
-      emailOtp: otp,
-      emailOtpExpires: otpExpires
+      isEmailVerified: true
     });
 
+    let doctorProfile = null;
     if (userRole === 'DOCTOR') {
-      await DoctorProfile.create({
+      doctorProfile = await DoctorProfile.create({
         user: user._id,
         specialty: specialty || 'General Physician',
         qualification: qualification || 'MBBS',
@@ -132,130 +124,11 @@ const registerUser = async (req, res) => {
       });
     }
 
-    await sendOtpEmail(normalizedEmail, otp, name.trim());
-
+    const token = generateToken(user._id);
     res.status(201).json({
       success: true,
-      requiresOtp: true,
-      email: normalizedEmail,
-      message: 'Registration successful! Please enter the 6-digit OTP code.',
-      otpPreview: otp
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// @desc    Verify 6-digit Email OTP & activate account
-// @route   POST /api/v1/auth/verify-otp
-// @access  Public
-const verifyOtp = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
-      return res.status(400).json({ success: false, message: 'Please provide email and 6-digit OTP code.' });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-
-    if (mongoose.connection.readyState !== 1) {
-      const user = global.memoryStore?.users.find((u) => u.email === normalizedEmail);
-      if (!user) {
-        return res.status(404).json({ success: false, message: 'User account not found.' });
-      }
-
-      if (user.emailOtp !== otp || new Date() > new Date(user.emailOtpExpires)) {
-        return res.status(400).json({ success: false, message: 'Invalid or expired 6-digit OTP code.' });
-      }
-
-      user.isEmailVerified = true;
-      delete user.emailOtp;
-      delete user.emailOtpExpires;
-
-      const doctorProfile = user.role === 'DOCTOR' ? global.memoryStore?.doctors.find((d) => d.user?._id === user._id) : null;
-      const token = generateToken(user._id);
-
-      return res.json({
-        success: true,
-        message: 'Email verified successfully!',
-        token,
-        user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, doctorProfile }
-      });
-    }
-
-    const user = await User.findOne({ email: normalizedEmail });
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User account not found.' });
-    }
-
-    if (user.emailOtp !== otp || new Date() > new Date(user.emailOtpExpires)) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired 6-digit OTP code.' });
-    }
-
-    user.isEmailVerified = true;
-    user.emailOtp = undefined;
-    user.emailOtpExpires = undefined;
-    await user.save();
-
-    let doctorProfile = null;
-    if (user.role === 'DOCTOR') {
-      doctorProfile = await DoctorProfile.findOne({ user: user._id });
-    }
-
-    const token = generateToken(user._id);
-    res.json({
-      success: true,
-      message: 'Email verified successfully!',
       token,
       user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, doctorProfile }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// @desc    Resend 6-digit Email OTP
-// @route   POST /api/v1/auth/resend-otp
-// @access  Public
-const resendOtp = async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, message: 'Please provide email.' });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    const newExpires = new Date(Date.now() + 10 * 60 * 1000);
-
-    if (mongoose.connection.readyState !== 1) {
-      const user = global.memoryStore?.users.find((u) => u.email === normalizedEmail);
-      if (!user) return res.status(404).json({ success: false, message: 'User account not found.' });
-
-      user.emailOtp = newOtp;
-      user.emailOtpExpires = newExpires;
-      await sendOtpEmail(normalizedEmail, newOtp, user.name);
-
-      return res.json({
-        success: true,
-        message: 'A new 6-digit OTP has been sent to your email.',
-        otpPreview: newOtp
-      });
-    }
-
-    const user = await User.findOne({ email: normalizedEmail });
-    if (!user) return res.status(404).json({ success: false, message: 'User account not found.' });
-
-    user.emailOtp = newOtp;
-    user.emailOtpExpires = newExpires;
-    await user.save();
-
-    await sendOtpEmail(normalizedEmail, newOtp, user.name);
-
-    res.json({
-      success: true,
-      message: 'A new 6-digit OTP has been sent to your email.',
-      otpPreview: newOtp
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -383,4 +256,4 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, verifyOtp, resendOtp, loginUser, getMe, updateUserProfile };
+module.exports = { registerUser, loginUser, getMe, updateUserProfile };
