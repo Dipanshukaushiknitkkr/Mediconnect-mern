@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const DoctorProfile = require('../models/DoctorProfile');
+const { sendOtpEmail } = require('../services/emailService');
 
 const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET;
@@ -90,14 +91,14 @@ const registerUser = async (req, res) => {
         global.memoryStore.doctors.push(doctorProfile);
       }
 
-      console.log(`[Email Service] 6-Digit OTP for ${normalizedEmail}: ${otp}`);
+      await sendOtpEmail(normalizedEmail, otp, name.trim());
 
       return res.status(201).json({
         success: true,
         requiresOtp: true,
         email: normalizedEmail,
-        message: 'Registration successful! Please enter the 6-digit OTP code sent to your email.',
-        otpPreview: process.env.NODE_ENV !== 'production' ? otp : undefined
+        message: 'Registration successful! Please enter the 6-digit OTP code.',
+        otpPreview: otp
       });
     }
 
@@ -131,14 +132,14 @@ const registerUser = async (req, res) => {
       });
     }
 
-    console.log(`[Email Service] 6-Digit OTP for ${normalizedEmail}: ${otp}`);
+    await sendOtpEmail(normalizedEmail, otp, name.trim());
 
     res.status(201).json({
       success: true,
       requiresOtp: true,
       email: normalizedEmail,
-      message: 'Registration successful! Please enter the 6-digit OTP code sent to your email.',
-      otpPreview: process.env.NODE_ENV !== 'production' ? otp : undefined
+      message: 'Registration successful! Please enter the 6-digit OTP code.',
+      otpPreview: otp
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -233,12 +234,12 @@ const resendOtp = async (req, res) => {
 
       user.emailOtp = newOtp;
       user.emailOtpExpires = newExpires;
-      console.log(`[Email Service] Resent 6-Digit OTP for ${normalizedEmail}: ${newOtp}`);
+      await sendOtpEmail(normalizedEmail, newOtp, user.name);
 
       return res.json({
         success: true,
         message: 'A new 6-digit OTP has been sent to your email.',
-        otpPreview: process.env.NODE_ENV !== 'production' ? newOtp : undefined
+        otpPreview: newOtp
       });
     }
 
@@ -249,12 +250,12 @@ const resendOtp = async (req, res) => {
     user.emailOtpExpires = newExpires;
     await user.save();
 
-    console.log(`[Email Service] Resent 6-Digit OTP for ${normalizedEmail}: ${newOtp}`);
+    await sendOtpEmail(normalizedEmail, newOtp, user.name);
 
     res.json({
       success: true,
       message: 'A new 6-digit OTP has been sent to your email.',
-      otpPreview: process.env.NODE_ENV !== 'production' ? newOtp : undefined
+      otpPreview: newOtp
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
