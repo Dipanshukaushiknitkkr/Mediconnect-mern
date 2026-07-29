@@ -71,9 +71,14 @@ const LoginPage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Password
+                </label>
+                <Link to="/forgot-password" className="text-[11px] font-bold text-blue-400 hover:underline">
+                  Forgot Password?
+                </Link>
+              </div>
               <div className="relative">
                 <KeyRound className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
                 <input

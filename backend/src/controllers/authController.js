@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const User = require('../models/User');
 const DoctorProfile = require('../models/DoctorProfile');
 
@@ -195,6 +196,100 @@ const loginUser = async (req, res) => {
   }
 };
 
+// @desc    Request Password Reset Token
+// @route   POST /api/v1/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Please provide email address.' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    if (mongoose.connection.readyState !== 1) {
+      const user = global.memoryStore?.users.find((u) => u.email === normalizedEmail);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User account not found with this email.' });
+      }
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpires = resetExpires;
+      return res.json({
+        success: true,
+        message: 'Password reset link generated successfully.',
+        resetToken
+      });
+    }
+
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User account not found with this email.' });
+    }
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetExpires;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Password reset link generated successfully.',
+      resetToken
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Reset Password using token
+// @route   POST /api/v1/auth/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Please provide reset token and new password.' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      const user = global.memoryStore?.users.find(
+        (u) => u.resetPasswordToken === token && new Date() < new Date(u.resetPasswordExpires)
+      );
+      if (!user) {
+        return res.status(400).json({ success: false, message: 'Invalid or expired password reset token.' });
+      }
+      user.password = await bcrypt.hash(newPassword, 10);
+      delete user.resetPasswordToken;
+      delete user.resetPasswordExpires;
+      return res.json({ success: true, message: 'Password reset successfully! You can now log in.' });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired password reset token.' });
+    }
+
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ success: true, message: 'Password reset successfully! You can now log in.' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Get current user profile
 // @route   GET /api/v1/auth/me
 // @access  Private
@@ -256,4 +351,4 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getMe, updateUserProfile };
+module.exports = { registerUser, loginUser, forgotPassword, resetPassword, getMe, updateUserProfile };
