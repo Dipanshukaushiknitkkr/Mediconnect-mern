@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { ShieldCheck, Check, AlertCircle } from 'lucide-react';
+import { ShieldCheck, Check, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const RegisterPage = () => {
   const { register } = useAuth();
@@ -20,6 +20,7 @@ const RegisterPage = () => {
     licenseNumber: '',
     hospital: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -134,15 +135,25 @@ const RegisterPage = () => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
                   Password
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  placeholder="Min 6 characters"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    required
+                    placeholder="Min 6 characters"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-3.5 text-slate-500 hover:text-slate-300 focus:outline-none"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
 
