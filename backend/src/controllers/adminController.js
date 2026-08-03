@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const DoctorProfile = require('../models/DoctorProfile');
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
+const { sendDoctorStatusEmail } = require('../services/emailService');
 
 // @desc    Get all registered users for admin management
 // @route   GET /api/v1/admin/users
@@ -42,7 +43,6 @@ const deleteUserAccount = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User account not found.' });
     }
 
-    // If deleting a doctor, also remove their doctor profile
     if (userToDelete.role === 'DOCTOR') {
       await DoctorProfile.deleteOne({ user: userToDelete._id });
     }
@@ -87,6 +87,12 @@ const verifyDoctor = async (req, res) => {
 
     const profile = await DoctorProfile.findByIdAndUpdate(req.params.id, { status }, { new: true }).populate('user', 'name email');
     if (!profile) return res.status(404).json({ success: false, message: 'Doctor application not found' });
+
+    if (profile.user?.email) {
+      sendDoctorStatusEmail(profile.user.email, profile.user.name, status).catch((err) =>
+        console.error('[Email Notice]:', err.message)
+      );
+    }
 
     res.json({ success: true, message: `Doctor status updated to ${status}`, profile });
   } catch (error) {

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Appointment = require('../models/Appointment');
 const DoctorProfile = require('../models/DoctorProfile');
 const Prescription = require('../models/Prescription');
+const { sendAppointmentConfirmationEmail } = require('../services/emailService');
 
 // @desc    Create a new appointment booking
 // @route   POST /api/v1/appointments
@@ -107,6 +108,17 @@ const createAppointment = async (req, res) => {
         req.io.to(`user-${populated.doctor._id}`).emit('appointment-updated', populated);
       }
 
+      if (populated?.patient?.email) {
+        sendAppointmentConfirmationEmail(populated.patient.email, {
+          patientName: populated.patient.name,
+          doctorName: populated.doctor.name,
+          specialty: doctorProfile.specialty || 'General Physician',
+          date: populated.date,
+          timeSlot: populated.timeSlot,
+          amount: populated.amount
+        }).catch((err) => console.error('[Email Notice]:', err.message));
+      }
+
       return res.status(201).json({ success: true, appointment: populated });
     }
 
@@ -129,6 +141,17 @@ const createAppointment = async (req, res) => {
       req.io.to(`user-${populated.doctor._id}`).emit('appointment-updated', populated);
     }
 
+    if (populated?.patient?.email) {
+      sendAppointmentConfirmationEmail(populated.patient.email, {
+        patientName: populated.patient.name,
+        doctorName: populated.doctor.name,
+        specialty: doctorProfile.specialty || 'General Physician',
+        date: populated.date,
+        timeSlot: populated.timeSlot,
+        amount: populated.amount
+      }).catch((err) => console.error('[Email Notice]:', err.message));
+    }
+
     res.status(201).json({ success: true, appointment: populated });
   } catch (error) {
     if (error.code === 11000) {
@@ -141,7 +164,7 @@ const createAppointment = async (req, res) => {
   }
 };
 
-// @desc    Get booked time slots for a doctor on a specific date (ONLY SCHEDULED appointments block slots)
+// @desc    Get booked time slots for a doctor on a specific date
 // @route   GET /api/v1/appointments/booked-slots
 // @access  Public
 const getBookedSlots = async (req, res) => {
@@ -169,7 +192,6 @@ const getBookedSlots = async (req, res) => {
 
     const doctorUserId = doctorProfile ? doctorProfile.user._id || doctorProfile.user : doctorId;
 
-    // Query ONLY SCHEDULED appointments. Cancelled/Completed appointments do NOT block slots!
     const activeAppointments = await Appointment.find({
       doctor: doctorUserId,
       date,
@@ -244,7 +266,6 @@ const updateAppointmentStatus = async (req, res) => {
       return res.status(403).json({ success: false, message: 'You are not authorized to update this appointment.' });
     }
 
-    // Only doctors/admins can mark COMPLETED. Either party (or admin) can CANCEL.
     if (status === 'COMPLETED' && !(isDoctor || isAdmin)) {
       return res.status(403).json({ success: false, message: 'Only the attending doctor can mark a consultation complete.' });
     }

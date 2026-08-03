@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import API from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { Mail, ArrowLeft, KeyRound, Loader2, CheckCircle2 } from 'lucide-react';
 
 const ForgotPasswordPage = () => {
   const toast = useToast();
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [resetToken, setResetToken] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -21,10 +19,7 @@ const ForgotPasswordPage = () => {
       const res = await API.post('/auth/forgot-password', { email });
       if (res.data.success) {
         setSuccess(true);
-        if (res.data.resetToken) {
-          setResetToken(res.data.resetToken);
-        }
-        toast.success('Password reset link generated!');
+        toast.success('Request received. Check your email inbox!');
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to request password reset.');
@@ -47,7 +42,7 @@ const ForgotPasswordPage = () => {
             <KeyRound className="w-7 h-7" />
           </div>
           <h2 className="text-3xl font-extrabold text-white">Forgot Password?</h2>
-          <p className="text-xs text-slate-400">Enter your account email address to reset your password</p>
+          <p className="text-xs text-slate-400">Enter your account email address to receive a secure reset link</p>
         </div>
 
         <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-5 border-slate-700/80 shadow-2xl">
@@ -56,22 +51,18 @@ const ForgotPasswordPage = () => {
               <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-extrabold text-white">Reset Link Ready</h3>
+              <h3 className="text-lg font-extrabold text-white">Check Your Inbox</h3>
               <p className="text-xs text-slate-400">
-                A password reset token has been generated for <strong className="text-white">{email}</strong>.
+                If an account exists for <strong className="text-white">{email}</strong>, a secure password reset link has been sent to your email address.
               </p>
-
-              {resetToken && (
-                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700 space-y-3">
-                  <p className="text-[11px] text-slate-400 font-medium">Click below to reset your password now:</p>
-                  <button
-                    onClick={() => navigate(`/reset-password?token=${resetToken}`)}
-                    className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow"
-                  >
-                    Proceed to Reset Password
-                  </button>
-                </div>
-              )}
+              <div className="pt-2">
+                <Link
+                  to="/login"
+                  className="inline-block py-2.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow"
+                >
+                  Return to Login
+                </Link>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -103,7 +94,7 @@ const ForgotPasswordPage = () => {
                     <span>Processing...</span>
                   </>
                 ) : (
-                  <span>Send Reset Link</span>
+                  <span>Send Reset Link to Email</span>
                 )}
               </button>
             </form>

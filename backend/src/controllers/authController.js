@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const User = require('../models/User');
 const DoctorProfile = require('../models/DoctorProfile');
+const { sendPasswordResetEmail } = require('../services/emailService');
 
 const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET;
@@ -196,7 +197,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Request Password Reset Token
+// @desc    Request Password Reset Link (Sends via email only)
 // @route   POST /api/v1/auth/forgot-password
 // @access  Public
 const forgotPassword = async (req, res) => {
@@ -210,40 +211,34 @@ const forgotPassword = async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
+    // Generic response to prevent account enumeration attacks
+    const genericSuccessMsg = 'If an account exists for this email address, a password reset link has been sent to your inbox.';
+
     if (mongoose.connection.readyState !== 1) {
       const user = global.memoryStore?.users.find((u) => u.email === normalizedEmail);
-      if (!user) {
-        return res.status(404).json({ success: false, message: 'User account not found with this email.' });
+      if (user) {
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpires = resetExpires;
+        await sendPasswordResetEmail(normalizedEmail, resetToken, user.name);
       }
-      user.resetPasswordToken = resetToken;
-      user.resetPasswordExpires = resetExpires;
-      return res.json({
-        success: true,
-        message: 'Password reset link generated successfully.',
-        resetToken
-      });
+      return res.json({ success: true, message: genericSuccessMsg });
     }
 
     const user = await User.findOne({ email: normalizedEmail });
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User account not found with this email.' });
+    if (user) {
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpires = resetExpires;
+      await user.save();
+      await sendPasswordResetEmail(normalizedEmail, resetToken, user.name);
     }
 
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = resetExpires;
-    await user.save();
-
-    res.json({
-      success: true,
-      message: 'Password reset link generated successfully.',
-      resetToken
-    });
+    res.json({ success: true, message: genericSuccessMsg });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// @desc    Reset Password using token
+// @desc    Reset Password using secure email token
 // @route   POST /api/v1/auth/reset-password
 // @access  Public
 const resetPassword = async (req, res) => {
