@@ -3,7 +3,7 @@ import API from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { X, Calendar, Clock, CreditCard, CheckCircle, ShieldCheck, Loader2 } from 'lucide-react';
+import { X, Calendar, Clock, CreditCard, CheckCircle, ShieldCheck, Loader2, ArrowRight } from 'lucide-react';
 
 const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
   const { user } = useAuth();
@@ -90,36 +90,36 @@ const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-700/80">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div className="relative w-full max-w-lg clinical-card rounded-2xl p-6 sm:p-7 shadow-2xl border border-white/10 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 text-slate-400 hover:text-white bg-slate-800/60 rounded-full transition-colors"
+          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white bg-slate-850 hover:bg-slate-800 rounded-lg transition-colors"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {/* Doctor Header */}
-        <div className="flex items-center space-x-4 mb-6 pb-6 border-b border-slate-800">
+        <div className="flex items-center space-x-3.5 mb-5 pb-4 border-b border-white/10">
           <img
             src={doctor.user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Doc'}
             alt={doctor.user?.name || 'Doctor'}
-            className="w-14 h-14 rounded-2xl object-cover ring-2 ring-blue-500/40"
+            className="w-12 h-12 rounded-xl object-cover ring-1 ring-sky-500/30"
           />
           <div>
-            <h3 className="text-lg font-bold text-white">{doctor.user?.name || 'Doctor'}</h3>
-            <p className="text-xs text-blue-400 font-medium">{doctor.specialty} • ${doctor.hourlyFee}/session</p>
+            <h3 className="text-base font-bold text-white">{doctor.user?.name || 'Doctor'}</h3>
+            <p className="text-xs text-sky-400 font-medium">{doctor.specialty} • ${doctor.hourlyFee}/session</p>
           </div>
         </div>
 
+        {/* Step 1: Slot Selection */}
         {step === 1 && (
-          <div className="space-y-5">
-            {/* Date Selection */}
+          <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center">
-                <Calendar className="w-4 h-4 mr-1.5 text-blue-400" />
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center">
+                <Calendar className="w-3.5 h-3.5 mr-1.5 text-sky-400" />
                 Select Appointment Date
               </label>
               <input
@@ -130,18 +130,17 @@ const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
                   setSelectedDate(e.target.value);
                   setSelectedSlot('');
                 }}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-blue-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500"
               />
             </div>
 
-            {/* Time Slot Selection */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center">
-                  <Clock className="w-4 h-4 mr-1.5 text-purple-400" />
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-semibold text-slate-300 flex items-center">
+                  <Clock className="w-3.5 h-3.5 mr-1.5 text-sky-400" />
                   Select Time Slot
                 </label>
-                <span className="text-[10px] text-emerald-400 font-semibold">Cancelled/Completed slots auto-freed</span>
+                <span className="text-[10px] text-emerald-400 font-medium">Real-time availability</span>
               </div>
 
               <div className="grid grid-cols-3 gap-2">
@@ -154,12 +153,12 @@ const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
                       type="button"
                       disabled={isTaken}
                       onClick={() => setSelectedSlot(slot)}
-                      className={`py-2.5 rounded-xl text-xs font-bold border transition-all ${
+                      className={`py-2 rounded-lg text-xs font-medium border transition-all ${
                         isTaken
-                          ? 'bg-slate-900/50 border-slate-850 text-slate-600 line-through cursor-not-allowed'
+                          ? 'bg-slate-900/40 border-white/5 text-slate-600 line-through cursor-not-allowed'
                           : selectedSlot === slot
-                          ? 'bg-blue-600 border-blue-400 text-white shadow-lg scale-105'
-                          : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+                          ? 'bg-sky-600 border-sky-400 text-white shadow-md font-semibold'
+                          : 'bg-slate-900/80 border-white/10 text-slate-300 hover:border-sky-500/40'
                       }`}
                     >
                       {slot} {isTaken && '(Booked)'}
@@ -169,21 +168,20 @@ const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
               </div>
             </div>
 
-            {/* Patient Symptoms / Notes */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                Chief Complaint / Patient Notes (Optional)
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                Consultation Reason / Chief Complaint (Optional)
               </label>
               <textarea
                 rows={2}
                 value={patientNotes}
                 onChange={(e) => setPatientNotes(e.target.value)}
-                placeholder="Describe any symptoms or reasons for your consultation..."
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-blue-500"
+                placeholder="Describe any symptoms or goals for your appointment..."
+                className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-sky-500"
               />
             </div>
 
-            {error && <p className="text-xs text-red-400 font-semibold">{error}</p>}
+            {error && <p className="text-xs text-red-400 font-medium">{error}</p>}
 
             <button
               onClick={() => {
@@ -193,69 +191,71 @@ const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
                 }
                 setStep(2);
               }}
-              className="w-full py-3 rounded-2xl gradient-btn text-sm font-bold text-white shadow-lg"
+              className="w-full py-2.5 rounded-xl clinical-btn-primary text-xs font-semibold shadow-md flex items-center justify-center space-x-1.5"
             >
-              Proceed to Payment (${doctor.hourlyFee})
+              <span>Continue to Confirmation (${doctor.hourlyFee})</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
 
+        {/* Step 2: Payment & Confirmation */}
         {step === 2 && (
-          <div className="space-y-5">
-            <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300 space-y-2">
+          <div className="space-y-4">
+            <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs text-sky-300 space-y-1.5">
               <div className="flex justify-between">
-                <span>Doctor:</span>
-                <span className="font-bold text-white">{doctor.user?.name}</span>
+                <span>Attending Specialist:</span>
+                <span className="font-semibold text-white">{doctor.user?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span>Date & Time:</span>
-                <span className="font-bold text-white">{selectedDate} at {selectedSlot}</span>
+                <span>Scheduled Date & Time:</span>
+                <span className="font-semibold text-white">{selectedDate} at {selectedSlot}</span>
               </div>
-              <div className="flex justify-between border-t border-blue-500/20 pt-2 text-sm">
-                <span className="font-bold">Total Amount Due:</span>
-                <span className="font-extrabold text-white">${doctor.hourlyFee} USD</span>
+              <div className="flex justify-between border-t border-sky-500/20 pt-1.5 text-xs">
+                <span className="font-semibold">Total Fee:</span>
+                <span className="font-bold text-white tabular-nums">${doctor.hourlyFee} USD</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+            <div className="p-3.5 rounded-xl bg-slate-900 border border-white/10 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-300 flex items-center">
-                  <CreditCard className="w-4 h-4 text-emerald-400 mr-2" />
-                  Razorpay / Stripe Payment Gateway
+                <span className="text-xs font-semibold text-slate-300 flex items-center">
+                  <CreditCard className="w-3.5 h-3.5 text-emerald-400 mr-1.5" />
+                  Telehealth Payment Gateway
                 </span>
-                <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">256-Bit SSL Encrypted</span>
+                <span className="text-[10px] bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded-md font-medium">256-Bit SSL Encrypted</span>
               </div>
               <input
                 type="text"
                 disabled
-                value="•••• •••• •••• 4242 (Demo Test Card)"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 font-mono"
+                value="•••• •••• •••• 4242 (Secure Test Card)"
+                className="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-white/5 text-xs text-slate-400 font-mono"
               />
             </div>
 
-            {error && <p className="text-xs text-red-400 font-semibold">{error}</p>}
+            {error && <p className="text-xs text-red-400 font-medium">{error}</p>}
 
-            <div className="flex space-x-3">
+            <div className="flex space-x-2.5">
               <button
                 onClick={() => setStep(1)}
-                className="w-1/3 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300"
+                className="w-1/3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300"
               >
                 Back
               </button>
               <button
                 onClick={handleBooking}
                 disabled={loading}
-                className="w-2/3 py-3 rounded-2xl gradient-btn text-sm font-bold text-white flex items-center justify-center space-x-2 shadow-lg disabled:opacity-50"
+                className="w-2/3 py-2.5 rounded-xl clinical-btn-primary text-xs font-semibold flex items-center justify-center space-x-2 shadow-md disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Processing Payment...</span>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Confirming...</span>
                   </>
                 ) : (
                   <>
-                    <ShieldCheck className="w-4 h-4 text-emerald-300" />
-                    <span>Confirm & Pay ${doctor.hourlyFee}</span>
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>Confirm & Book (${doctor.hourlyFee})</span>
                   </>
                 )}
               </button>
@@ -263,19 +263,20 @@ const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
           </div>
         )}
 
+        {/* Step 3: Success Screen */}
         {step === 3 && createdAppointment && (
-          <div className="text-center space-y-4 py-4 animate-scale-up">
-            <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto ring-4 ring-emerald-500/30">
-              <CheckCircle className="w-10 h-10" />
+          <div className="text-center space-y-3.5 py-3">
+            <div className="w-12 h-12 bg-emerald-500/15 text-emerald-400 rounded-full flex items-center justify-center mx-auto ring-4 ring-emerald-500/20">
+              <CheckCircle className="w-7 h-7" />
             </div>
 
-            <h4 className="text-xl font-extrabold text-white">Appointment Confirmed!</h4>
-            <p className="text-xs text-slate-400">
-              Your video consultation with <span className="text-white font-semibold">{doctor.user?.name}</span> is scheduled for <span className="text-blue-400 font-bold">{selectedDate}</span> at <span className="text-purple-400 font-bold">{selectedSlot}</span>.
+            <h4 className="text-lg font-bold text-white">Consultation Confirmed</h4>
+            <p className="text-xs text-slate-300">
+              Your appointment with <span className="text-white font-semibold">{doctor.user?.name}</span> is confirmed for <span className="text-sky-400 font-semibold">{selectedDate}</span> at <span className="text-sky-400 font-semibold">{selectedSlot}</span>.
             </p>
 
-            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 font-mono">
-              Meeting ID: <span className="text-emerald-400 font-bold">{createdAppointment.meetingRoomId}</span>
+            <div className="p-2.5 rounded-lg bg-slate-900 border border-white/10 text-xs text-slate-400 font-mono">
+              Room ID: <span className="text-emerald-400 font-bold">{createdAppointment.meetingRoomId}</span>
             </div>
 
             <button
@@ -283,9 +284,9 @@ const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
                 onClose();
                 navigate('/dashboard');
               }}
-              className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-sm font-bold text-white shadow-lg"
+              className="w-full py-2.5 rounded-xl clinical-btn-primary text-xs font-semibold shadow-md"
             >
-              Go to Patient Dashboard
+              Open Patient Dashboard
             </button>
           </div>
         )}

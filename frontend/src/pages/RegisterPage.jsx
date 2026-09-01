@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { ShieldCheck, Check, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Check, AlertCircle, Eye, EyeOff, Stethoscope, User } from 'lucide-react';
 
 const RegisterPage = () => {
   const { register } = useAuth();
@@ -34,7 +34,7 @@ const RegisterPage = () => {
 
     if (score <= 1) return { score: 25, label: 'Weak', color: 'bg-red-500' };
     if (score === 2) return { score: 50, label: 'Fair', color: 'bg-yellow-500' };
-    if (score === 3) return { score: 75, label: 'Good', color: 'bg-blue-500' };
+    if (score === 3) return { score: 75, label: 'Good', color: 'bg-sky-500' };
     return { score: 100, label: 'Strong', color: 'bg-emerald-500' };
   };
 
@@ -59,7 +59,7 @@ const RegisterPage = () => {
       if (role === 'DOCTOR') navigate('/doctor-dashboard');
       else navigate('/dashboard');
     } catch (err) {
-      const msg = err.response?.data?.message || 'Registration failed. Please check inputs.';
+      const msg = err.response?.data?.message || 'Registration failed. Please verify inputs.';
       setError(msg);
       toast.error(msg);
     } finally {
@@ -71,54 +71,56 @@ const RegisterPage = () => {
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg space-y-6">
         
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-extrabold text-white">Create Account</h2>
-          <p className="text-xs text-slate-400">Join MediConnect as a Patient or Healthcare Specialist</p>
+        <div className="text-center space-y-1.5">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Create MediConnect Account</h2>
+          <p className="text-xs text-slate-400">Join as a Patient or Accredited Medical Specialist</p>
         </div>
 
-        {/* Public Role Switcher (Patient vs Doctor) */}
-        <div className="flex p-1 rounded-2xl glass-panel border-slate-700">
+        {/* Role Switcher Pill */}
+        <div className="flex p-1 rounded-xl clinical-card border border-white/10">
           <button
             type="button"
             onClick={() => setRole('PATIENT')}
-            className={`w-1/2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-              role === 'PATIENT' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
+            className={`w-1/2 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center space-x-1.5 ${
+              role === 'PATIENT' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Patient Account
+            <User className="w-3.5 h-3.5" />
+            <span>Patient Account</span>
           </button>
           <button
             type="button"
             onClick={() => setRole('DOCTOR')}
-            className={`w-1/2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-              role === 'DOCTOR' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
+            className={`w-1/2 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center space-x-1.5 ${
+              role === 'DOCTOR' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Doctor / Specialist
+            <Stethoscope className="w-3.5 h-3.5" />
+            <span>Doctor / Specialist</span>
           </button>
         </div>
 
-        <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-4 border-slate-700/80 shadow-2xl">
+        <div className="clinical-card p-6 sm:p-7 rounded-2xl space-y-4 border border-white/5 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Full Name
               </label>
               <input
                 type="text"
                 name="name"
                 required
-                placeholder="Full Name"
+                placeholder="Dr. John Doe or Jane Smith"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-sky-500"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
                   Email Address
                 </label>
                 <input
@@ -128,11 +130,11 @@ const RegisterPage = () => {
                   placeholder="name@domain.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-sky-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
                   Password
                 </label>
                 <div className="relative">
@@ -143,12 +145,12 @@ const RegisterPage = () => {
                     placeholder="Min 6 characters"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    className="w-full pl-3.5 pr-9 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-sky-500"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-500 hover:text-slate-300 focus:outline-none"
+                    className="absolute right-3 top-2 text-slate-500 hover:text-slate-300 focus:outline-none"
                     title={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -159,37 +161,37 @@ const RegisterPage = () => {
 
             {/* Password Strength Meter */}
             {formData.password && (
-              <div className="space-y-1.5 pt-1">
+              <div className="space-y-1 pt-0.5">
                 <div className="flex justify-between items-center text-[11px]">
-                  <span className="text-slate-400 font-medium">Password Strength:</span>
-                  <span className={`font-bold ${
+                  <span className="text-slate-400 font-medium">Strength:</span>
+                  <span className={`font-semibold ${
                     strength.label === 'Strong' ? 'text-emerald-400' :
-                    strength.label === 'Good' ? 'text-blue-400' :
+                    strength.label === 'Good' ? 'text-sky-400' :
                     strength.label === 'Fair' ? 'text-yellow-400' : 'text-red-400'
                   }`}>{strength.label}</span>
                 </div>
-                <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                <div className="w-full h-1 bg-slate-900 rounded-full overflow-hidden">
                   <div
                     className={`h-full transition-all duration-300 ${strength.color}`}
                     style={{ width: `${strength.score}%` }}
-                  ></div>
+                  />
                 </div>
               </div>
             )}
 
             {/* Doctor Specific Fields */}
             {role === 'DOCTOR' && (
-              <div className="space-y-4 pt-3 border-t border-slate-800">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-3.5 pt-2.5 border-t border-white/5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
                       Specialty
                     </label>
                     <select
                       name="specialty"
                       value={formData.specialty}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-purple-500"
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-500"
                     >
                       <option value="Cardiology">Cardiology</option>
                       <option value="Dermatology">Dermatology</option>
@@ -200,7 +202,7 @@ const RegisterPage = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
                       Qualification
                     </label>
                     <input
@@ -210,26 +212,26 @@ const RegisterPage = () => {
                       placeholder="e.g. MD, MBBS, MS"
                       value={formData.qualification}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder-slate-500"
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-sky-500"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
-                      Exp. (Years)
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Exp. (Yrs)
                     </label>
                     <input
                       type="number"
                       name="experienceYears"
                       value={formData.experienceYears}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
                       Fee ($/session)
                     </label>
                     <input
@@ -237,44 +239,44 @@ const RegisterPage = () => {
                       name="hourlyFee"
                       value={formData.hourlyFee}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
                       License No.
                     </label>
                     <input
                       type="text"
                       name="licenseNumber"
                       required
-                      placeholder="LIC-123456"
+                      placeholder="LIC-100204"
                       value={formData.licenseNumber}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs"
                     />
                   </div>
                 </div>
               </div>
             )}
 
-            {error && <p className="text-xs text-red-400 font-semibold">{error}</p>}
+            {error && <p className="text-xs text-red-400 font-medium">{error}</p>}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-2xl gradient-btn font-bold text-white text-sm shadow-lg disabled:opacity-50"
+              className="w-full py-2.5 rounded-xl clinical-btn-primary font-semibold text-white text-xs sm:text-sm shadow-md disabled:opacity-50"
             >
-              {loading ? 'Creating Account...' : `Register as ${role}`}
+              {loading ? 'Creating Account...' : `Register as ${role === 'DOCTOR' ? 'Physician' : 'Patient'}`}
             </button>
           </form>
 
-          <p className="text-center text-xs text-slate-400">
-            Already have an account?{' '}
-            <Link to="/login" className="text-blue-400 font-bold hover:underline">
+          <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
+            <span>Already have an account?</span>
+            <Link to="/login" className="text-sky-400 font-semibold hover:underline">
               Sign In
             </Link>
-          </p>
+          </div>
         </div>
 
       </div>

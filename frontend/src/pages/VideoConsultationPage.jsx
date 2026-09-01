@@ -3,7 +3,20 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Mic, MicOff, Video as VideoIcon, VideoOff, PhoneOff, Send, User, Signal, RefreshCw, MessageSquare } from 'lucide-react';
+import {
+  Mic,
+  MicOff,
+  Video as VideoIcon,
+  VideoOff,
+  PhoneOff,
+  Send,
+  User,
+  Signal,
+  RefreshCw,
+  MessageSquare,
+  ShieldCheck,
+  Activity
+} from 'lucide-react';
 
 const ICE_SERVERS = {
   iceServers: [
@@ -56,7 +69,7 @@ const VideoConsultationPage = () => {
         }
       } catch (err) {
         console.warn('Camera/Mic permission warning:', err.message);
-        toast.info('Previewing video consultation room. Grant media permissions for full video.');
+        toast.info('Previewing video room. Grant media permissions for camera/mic.');
       }
     };
 
@@ -79,7 +92,7 @@ const VideoConsultationPage = () => {
 
     const handleConnectError = (err) => {
       console.error('Socket connection error:', err.message);
-      toast.error('Could not connect to the consultation server. Please refresh.');
+      toast.error('Could not connect to the consultation room. Please refresh.');
     };
 
     socket.once('connect', handleConnect);
@@ -219,7 +232,7 @@ const VideoConsultationPage = () => {
       if (audioTrack) {
         audioTrack.enabled = !micActive;
         setMicActive(!micActive);
-        toast.info(micActive ? 'Microphone Muted 🔇' : 'Microphone Unmuted 🎙️');
+        toast.info(micActive ? 'Microphone Muted' : 'Microphone Active');
       }
     }
   };
@@ -230,7 +243,7 @@ const VideoConsultationPage = () => {
       if (videoTrack) {
         videoTrack.enabled = !camActive;
         setCamActive(!camActive);
-        toast.info(camActive ? 'Camera Disabled 📹' : 'Camera Enabled 📷');
+        toast.info(camActive ? 'Camera Disabled' : 'Camera Enabled');
       }
     }
   };
@@ -251,7 +264,7 @@ const VideoConsultationPage = () => {
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((t) => t.stop());
     }
-    toast.info('Consultation session ended.');
+    toast.info('Consultation call ended.');
     if (user?.role === 'DOCTOR') navigate('/doctor-dashboard');
     else navigate('/dashboard');
   };
@@ -259,27 +272,27 @@ const VideoConsultationPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col lg:flex-row p-4 gap-4">
       
-      {/* LEFT PANEL: HD VIDEO ROOM */}
+      {/* LEFT PANEL: HD CLINICAL VIDEO ROOM */}
       <div className="flex-1 flex flex-col justify-between space-y-4">
         
-        {/* Top Header */}
-        <div className="glass-panel px-6 py-3 rounded-2xl flex items-center justify-between">
+        {/* Top Clinical Header */}
+        <div className="clinical-card px-5 py-3 rounded-2xl flex items-center justify-between border border-white/5">
           <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-vital-pulse" />
             <div>
-              <h2 className="font-bold text-sm text-white">Telehealth Encrypted WebRTC Consultation</h2>
-              <p className="text-[11px] text-slate-400">Room ID: {roomId}</p>
+              <h2 className="font-bold text-xs sm:text-sm text-white">Telehealth Encrypted Video Consultation</h2>
+              <p className="text-[11px] text-slate-400 font-mono">Session ID: {roomId}</p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+          <div className="flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
             <Signal className="w-3.5 h-3.5" />
-            <span>HD 1080p • Encrypted</span>
+            <span>HD 1080p • 256-Bit</span>
           </div>
         </div>
 
         {/* Video Canvas Container */}
-        <div className="relative flex-1 min-h-[440px] glass-panel rounded-3xl overflow-hidden flex items-center justify-center bg-slate-900 border-slate-800">
+        <div className="relative flex-1 min-h-[440px] clinical-card rounded-2xl overflow-hidden flex items-center justify-center bg-slate-900/90 border border-white/5">
           
           {/* Remote Peer Video Stream */}
           <video
@@ -292,27 +305,27 @@ const VideoConsultationPage = () => {
           {/* Placeholder when remote peer has not joined */}
           {!hasRemoteVideo && (
             <div className="text-center p-6 space-y-4">
-              <div className="relative w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400 border border-slate-700">
-                <User className="w-12 h-12" />
-                <div className="absolute inset-0 rounded-full border-2 border-blue-500/40 animate-ping"></div>
+              <div className="relative w-20 h-20 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto text-slate-400 border border-white/10">
+                <User className="w-10 h-10" />
+                <div className="absolute inset-0 rounded-2xl border-2 border-sky-500/40 animate-vital-pulse" />
               </div>
 
               <div>
-                <h3 className="text-lg font-bold text-white">
-                  {remoteUser ? `${remoteUser} (Connecting Audio/Video...)` : 'Waiting for participant to join room...'}
+                <h3 className="text-base font-bold text-white">
+                  {remoteUser ? `${remoteUser} (Connecting Stream...)` : 'Waiting for participant to join session...'}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">End-to-End Encrypted WebRTC Consultation Channel</p>
+                <p className="text-xs text-slate-400 mt-0.5">End-to-End Encrypted WebRTC Telehealth Link</p>
               </div>
 
-              <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-300 text-xs border border-blue-500/20">
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-400" />
-                <span>Waiting for peer WebRTC handshake...</span>
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-lg bg-sky-500/10 text-sky-300 text-xs border border-sky-500/20">
+                <RefreshCw className="w-3 h-3 animate-spin text-sky-400" />
+                <span>Synchronizing peer connection handshake...</span>
               </div>
             </div>
           )}
 
-          {/* Self Camera Picture-in-Picture Preview */}
-          <div className="absolute bottom-4 right-4 w-40 h-28 sm:w-48 sm:h-36 rounded-2xl glass-panel overflow-hidden border-2 border-blue-500/50 shadow-2xl bg-black">
+          {/* Picture-in-Picture Self Camera Preview */}
+          <div className="absolute bottom-4 right-4 w-36 h-24 sm:w-44 sm:h-32 rounded-xl clinical-card overflow-hidden border border-sky-500/40 shadow-2xl bg-black">
             <video
               ref={localVideoRef}
               autoPlay
@@ -320,7 +333,7 @@ const VideoConsultationPage = () => {
               muted
               className="w-full h-full object-cover transform -scale-x-100"
             />
-            <span className="absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/70 text-white backdrop-blur">
+            <span className="absolute bottom-1.5 left-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-black/75 text-white backdrop-blur">
               You ({displayName})
             </span>
           </div>
@@ -328,89 +341,89 @@ const VideoConsultationPage = () => {
         </div>
 
         {/* Floating Call Controls Toolbar */}
-        <div className="glass-panel p-4 rounded-2xl flex items-center justify-center space-x-4">
+        <div className="clinical-card p-3 rounded-2xl flex items-center justify-center space-x-3.5 border border-white/5">
           <button
             aria-label={micActive ? 'Mute microphone' : 'Unmute microphone'}
             onClick={toggleMic}
-            className={`p-3.5 rounded-2xl transition-all ${
-              micActive ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-red-500 text-white shadow-lg shadow-red-500/30'
+            className={`p-3 rounded-xl transition-all ${
+              micActive ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-red-500 text-white shadow-md'
             }`}
           >
-            {micActive ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+            {micActive ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
           </button>
 
           <button
             aria-label={camActive ? 'Turn off camera' : 'Turn on camera'}
             onClick={toggleCam}
-            className={`p-3.5 rounded-2xl transition-all ${
-              camActive ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-red-500 text-white shadow-lg shadow-red-500/30'
+            className={`p-3 rounded-xl transition-all ${
+              camActive ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-red-500 text-white shadow-md'
             }`}
           >
-            {camActive ? <VideoIcon className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+            {camActive ? <VideoIcon className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
           </button>
 
           <button
             aria-label="End call"
             onClick={handleEndCall}
-            className="px-6 py-3.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center space-x-2 shadow-xl hover:scale-105 transition-transform"
+            className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-xs flex items-center space-x-1.5 shadow-md transition-all"
           >
-            <PhoneOff className="w-5 h-5" />
+            <PhoneOff className="w-4 h-4" />
             <span>End Call</span>
           </button>
         </div>
 
       </div>
 
-      {/* RIGHT PANEL: LIVE CONSULTATION CHAT */}
-      <div className="w-full lg:w-96 glass-panel rounded-3xl p-5 flex flex-col justify-between border-slate-800 h-[600px] lg:h-auto">
+      {/* RIGHT PANEL: LIVE CLINICAL CONSULTATION CHAT */}
+      <div className="w-full lg:w-96 clinical-card rounded-2xl p-5 flex flex-col justify-between border border-white/5 h-[580px] lg:h-auto">
         
         {/* Chat Header */}
-        <div className="pb-3 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center space-x-2 text-white font-bold text-sm">
-            <MessageSquare className="w-4 h-4 text-blue-400" />
-            <span>Consultation Chat</span>
+        <div className="pb-3 border-b border-white/10 flex items-center justify-between">
+          <div className="flex items-center space-x-2 text-white font-bold text-xs sm:text-sm">
+            <MessageSquare className="w-4 h-4 text-sky-400" />
+            <span>Clinical In-Call Notes & Chat</span>
           </div>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 font-bold border border-blue-500/20">
+          <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-300 font-semibold border border-sky-500/20">
             Encrypted
           </span>
         </div>
 
         {/* Chat Messages Body */}
-        <div className="flex-1 overflow-y-auto py-4 space-y-3 pr-1 max-h-[460px]">
+        <div className="flex-1 overflow-y-auto py-3.5 space-y-2.5 pr-1 max-h-[440px]">
           {messages.length > 0 ? (
             messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`p-3 rounded-2xl max-w-[85%] text-xs ${
+                className={`p-2.5 rounded-xl max-w-[85%] text-xs ${
                   msg.senderName === displayName
-                    ? 'ml-auto bg-blue-600 text-white rounded-br-none'
-                    : 'mr-auto bg-slate-900 text-slate-200 rounded-bl-none border border-slate-700'
+                    ? 'ml-auto bg-sky-600 text-white rounded-br-none'
+                    : 'mr-auto bg-slate-900 text-slate-200 rounded-bl-none border border-white/10'
                 }`}
               >
-                <span className="font-bold text-[10px] opacity-75 block mb-0.5">{msg.senderName}</span>
+                <span className="font-semibold text-[10px] opacity-80 block mb-0.5">{msg.senderName}</span>
                 <p className="leading-relaxed">{msg.message}</p>
               </div>
             ))
           ) : (
             <div className="text-center text-xs text-slate-500 py-16">
-              <MessageSquare className="w-8 h-8 text-slate-600 mx-auto mb-2 opacity-50" />
-              <p>Send a message to start live consultation chat...</p>
+              <MessageSquare className="w-6 h-6 text-slate-600 mx-auto mb-1.5 opacity-50" />
+              <p>Type below to send encrypted messages during consultation...</p>
             </div>
           )}
           <div ref={chatBottomRef} />
         </div>
 
         {/* Chat Input Form */}
-        <form onSubmit={handleSendMessage} className="pt-3 border-t border-slate-800 flex items-center space-x-2">
+        <form onSubmit={handleSendMessage} className="pt-3 border-t border-white/10 flex items-center space-x-2">
           <input
             type="text"
-            placeholder="Type message..."
+            placeholder="Type clinical note or message..."
             value={inputMsg}
             onChange={(e) => setInputMsg(e.target.value)}
-            className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
           />
-          <button type="submit" aria-label="Send message" className="p-2.5 rounded-xl gradient-btn text-white">
-            <Send className="w-4 h-4" />
+          <button type="submit" aria-label="Send message" className="p-2 rounded-xl clinical-btn-primary text-white">
+            <Send className="w-3.5 h-3.5" />
           </button>
         </form>
 
