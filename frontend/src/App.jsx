@@ -35,7 +35,7 @@ const App = () => {
         <SocketProvider>
           <ToastProvider>
             <Router>
-              <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between transition-colors">
+              <div className="min-h-screen bg-[#FBF6EF] text-[#1C2B24] flex flex-col justify-between transition-colors">
                 
                 <div>
                   <Navbar />
@@ -97,7 +97,7 @@ const App = () => {
                 </div>
 
                 {/* Expanded Multi-Column Healthcare Trust Footer */}
-                <footer className="glass-panel border-t border-slate-800/80 pt-12 pb-8 text-xs text-slate-400 mt-16">
+                <footer className="bg-white border-t border-[#E8DFD3] pt-12 pb-8 text-xs text-[#53655D] mt-16">
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
                     
                     {/* Main Footer Columns */}
@@ -106,62 +106,62 @@ const App = () => {
                       {/* Col 1: Brand & Overview (2 cols on lg) */}
                       <div className="lg:col-span-2 space-y-4">
                         <Link to="/" className="flex items-center space-x-2.5">
-                          <div className="p-1.5 rounded-lg bg-sky-600 text-white shadow-sm">
+                          <div className="p-1.5 rounded-lg bg-[#1F4D3D] text-white shadow-sm">
                             <Stethoscope className="w-4 h-4" />
                           </div>
-                          <span className="text-base font-bold text-white tracking-tight">
-                            Medi<span className="text-sky-400">Connect</span>
+                          <span className="text-base font-bold font-serif text-[#1C2B24] tracking-tight">
+                            Medi<span className="text-[#1F4D3D]">Connect</span>
                           </span>
                         </Link>
 
-                        <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
+                        <p className="text-xs text-[#53655D] leading-relaxed max-w-sm">
                           Encrypted WebRTC telehealth platform combining AI symptom triage, verified physician consultations, and digital prescription management.
                         </p>
 
-                        <div className="flex items-center space-x-2 pt-1 text-[11px] text-emerald-400">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-vital-pulse" />
+                        <div className="flex items-center space-x-2 pt-1 text-xs text-[#1F4D3D] font-medium">
+                          <span className="w-2 h-2 rounded-full bg-[#1F4D3D] animate-vital-pulse" />
                           <span>Systems Operational • 256-Bit Encrypted Media</span>
                         </div>
                       </div>
 
                       {/* Col 2: Patient Care */}
                       <div className="space-y-3">
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">Patient Care</h4>
+                        <h4 className="text-xs font-bold text-[#1C2B24] uppercase tracking-wider">Patient Care</h4>
                         <ul className="space-y-2 text-xs">
                           <li>
-                            <Link to="/" className="hover:text-white transition-colors">Find a Doctor</Link>
+                            <Link to="/" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">Find a Doctor</Link>
                           </li>
                           <li>
-                            <Link to="/med-ai" className="hover:text-white transition-colors">AI Symptom Triage</Link>
+                            <Link to="/med-ai" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">AI Symptom Triage</Link>
                           </li>
                           <li>
-                            <Link to="/how-it-works" className="hover:text-white transition-colors">How It Works</Link>
+                            <Link to="/how-it-works" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">How It Works</Link>
                           </li>
                           <li>
-                            <Link to="/login" className="hover:text-white transition-colors">Patient Portal</Link>
+                            <Link to="/login" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">Patient Portal</Link>
                           </li>
                         </ul>
                       </div>
 
                       {/* Col 3: Company & Project */}
                       <div className="space-y-3">
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">Platform & Code</h4>
+                        <h4 className="text-xs font-bold text-[#1C2B24] uppercase tracking-wider">Platform & Code</h4>
                         <ul className="space-y-2 text-xs">
                           <li>
-                            <Link to="/about" className="hover:text-white transition-colors">About MediConnect</Link>
+                            <Link to="/about" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">About MediConnect</Link>
                           </li>
                           <li>
-                            <Link to="/contact" className="hover:text-white transition-colors">Contact & Support</Link>
+                            <Link to="/contact" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">Contact & Support</Link>
                           </li>
                           <li>
-                            <Link to="/register" className="hover:text-white transition-colors">Physician Registration</Link>
+                            <Link to="/register" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">Physician Registration</Link>
                           </li>
                           <li>
                             <a
                               href="https://github.com/Dipanshukaushiknitkkr/Mediconnect-mern"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="hover:text-white transition-colors inline-flex items-center space-x-1"
+                              className="text-[#53655D] hover:text-[#1F4D3D] transition-colors inline-flex items-center space-x-1"
                             >
                               <span>GitHub Repository</span>
                             </a>
@@ -171,16 +171,16 @@ const App = () => {
 
                       {/* Col 4: Trust & Legal */}
                       <div className="space-y-3">
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">Trust & Legal</h4>
+                        <h4 className="text-xs font-bold text-[#1C2B24] uppercase tracking-wider">Trust & Legal</h4>
                         <ul className="space-y-2 text-xs">
                           <li>
-                            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                            <Link to="/privacy" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">Privacy Policy</Link>
                           </li>
                           <li>
-                            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+                            <Link to="/terms" className="text-[#53655D] hover:text-[#1F4D3D] transition-colors">Terms of Service</Link>
                           </li>
                           <li>
-                            <span className="text-slate-500 block">Demonstration Sandbox</span>
+                            <span className="text-[#7B8D85] block">Demonstration Sandbox</span>
                           </li>
                         </ul>
                       </div>
@@ -188,15 +188,15 @@ const App = () => {
                     </div>
 
                     {/* Medical Emergency Disclaimer Banner */}
-                    <div className="p-4 rounded-xl bg-slate-900/60 border border-white/5 text-[11px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+                    <div className="p-4 rounded-xl bg-[#FBF6EF] border border-[#E8DFD3] text-xs text-[#53655D] flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
                       <p>
-                        <strong className="text-slate-300">Medical Emergency:</strong> If you are experiencing an acute medical emergency, please call <strong className="text-red-400">911</strong> (or your local emergency number) immediately.
+                        <strong className="text-[#1C2B24]">Medical Emergency:</strong> If you are experiencing an acute medical emergency, please call <strong className="text-[#C4501F]">911</strong> (or your local emergency number) immediately.
                       </p>
-                      <span className="text-[10px] text-slate-500 shrink-0">Open Source Healthcare Engineering</span>
+                      <span className="text-[11px] text-[#7B8D85] shrink-0">Open Source Healthcare Engineering</span>
                     </div>
 
                     {/* Bottom Copyright & Citation */}
-                    <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-2">
+                    <div className="pt-4 border-t border-[#E8DFD3] flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#7B8D85] gap-2">
                       <p>© {new Date().getFullYear()} MediConnect Telehealth • Virtual Doctor Visits & Digital Prescriptions</p>
                       <p className="italic">"Wherever the art of Medicine is loved, there is also a love of Humanity." — Hippocrates</p>
                     </div>

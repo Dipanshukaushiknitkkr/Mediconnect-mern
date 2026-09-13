@@ -176,6 +176,36 @@
   background: #B8ADA0;
 }
 
+/* High-Contrast Clinical Text Normalization */
+.text-white:not(.btn-cta-primary):not(.btn-forest-primary):not(.bg-\[\#1F4D3D\] *):not(.bg-\[\#C4501F\] *):not(button.btn-cta-primary *):not(button.btn-forest-primary *):not(.bg-sky-600 *):not(.bg-sky-500 *):not(.btn-cta-primary *) {
+  color: #1C2B24 !important;
+}
+
+.text-slate-100, .text-slate-200 {
+  color: #1C2B24 !important;
+}
+
+.text-slate-300 {
+  color: #44564E !important;
+}
+
+.text-slate-400 {
+  color: #53655D !important;
+}
+
+.text-slate-500 {
+  color: #7B8D85 !important;
+}
+
+.bg-slate-900, .bg-slate-950, .bg-slate-850, .bg-slate-800 {
+  background-color: #FBF6EF !important;
+  color: #1C2B24;
+}
+
+.border-white\/5, .border-white\/10, .border-white\/20, .border-slate-800, .border-slate-700 {
+  border-color: #E8DFD3 !important;
+}
+
 /* Accessibility: Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
