@@ -38,6 +38,14 @@
     transition: background-color 0.25s ease, color 0.25s ease;
     -webkit-font-smoothing: antialiased;
   }
+
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
+
+  button, a {
+    cursor: pointer;
+  }
 }
 
 /* Clinical Surface Systems */

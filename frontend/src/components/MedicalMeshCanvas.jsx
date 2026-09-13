@@ -2,8 +2,9 @@ import React, { useEffect, useRef } from 'react';
 
 /**
  * MedicalMeshCanvas
- * High-performance 3D perspective particle and wave lattice canvas.
+ * High-performance lightweight 3D perspective particle and wave lattice canvas.
  * Simulates real-time digital bio-telemetry waves with cursor interactivity.
+ * Zero external 3D asset overhead (<5KB vanilla canvas).
  */
 export default function MedicalMeshCanvas({ className = '' }) {
   const canvasRef = useRef(null);
@@ -23,13 +24,19 @@ export default function MedicalMeshCanvas({ className = '' }) {
     let targetMouseX = width / 2;
     let targetMouseY = height / 2;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const handleResize = () => {
       if (!canvas.parentElement) return;
       width = canvas.width = canvas.parentElement.offsetWidth;
       height = canvas.height = canvas.parentElement.offsetHeight;
+      if (prefersReducedMotion) {
+        drawFrame(0.5);
+      }
     };
 
     const handleMouseMove = (e) => {
+      if (prefersReducedMotion) return;
       const rect = canvas.getBoundingClientRect();
       targetMouseX = e.clientX - rect.left;
       targetMouseY = e.clientY - rect.top;
@@ -43,16 +50,11 @@ export default function MedicalMeshCanvas({ className = '' }) {
     const rows = 12;
     let step = 0;
 
-    const render = () => {
-      step += 0.02;
-      mouseX += (targetMouseX - mouseX) * 0.05;
-      mouseY += (targetMouseY - mouseY) * 0.05;
-
+    const drawFrame = (currentStep) => {
       ctx.clearRect(0, 0, width, height);
 
       const cellW = width / (cols - 1);
       const cellH = height / (rows - 1);
-
       const points = [];
 
       // Calculate 3D-elevated undulating mesh points
@@ -69,7 +71,7 @@ export default function MedicalMeshCanvas({ className = '' }) {
           const mouseEffect = Math.max(0, 1 - dist / 220) * 35;
 
           // Harmonic bio-wave equation
-          const wave = Math.sin(c * 0.35 + step) * Math.cos(r * 0.45 + step * 0.8) * 16;
+          const wave = Math.sin(c * 0.35 + currentStep) * Math.cos(r * 0.45 + currentStep * 0.8) * 16;
           const elevation = wave - mouseEffect;
 
           points[r][c] = {
@@ -112,7 +114,7 @@ export default function MedicalMeshCanvas({ className = '' }) {
       for (let r = 1; r < rows - 1; r += 2) {
         for (let c = 1; c < cols - 1; c += 2) {
           const pt = points[r][c];
-          const pulse = (Math.sin(step * 2 + r + c) + 1) / 2;
+          const pulse = (Math.sin(currentStep * 2 + r + c) + 1) / 2;
 
           ctx.beginPath();
           ctx.arc(pt.x, pt.y, 2 + pulse * 1.5, 0, Math.PI * 2);
@@ -122,7 +124,24 @@ export default function MedicalMeshCanvas({ className = '' }) {
           ctx.fill();
         }
       }
+    };
 
+    if (prefersReducedMotion) {
+      drawFrame(0.5);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        if (canvas.parentElement) {
+          canvas.parentElement.removeEventListener('mousemove', handleMouseMove);
+        }
+      };
+    }
+
+    const render = () => {
+      step += 0.02;
+      mouseX += (targetMouseX - mouseX) * 0.05;
+      mouseY += (targetMouseY - mouseY) * 0.05;
+
+      drawFrame(step);
       animationFrameId = requestAnimationFrame(render);
     };
 

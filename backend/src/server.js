@@ -64,6 +64,7 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 
 // Mount routes under /api and /api/v1
 const mountRoutes = (prefix) => {
@@ -73,6 +74,7 @@ const mountRoutes = (prefix) => {
   app.use(`${prefix}/admin`, adminRoutes);
   app.use(`${prefix}/ai`, aiRoutes);
   app.use(`${prefix}/payments`, paymentRoutes);
+  app.use(`${prefix}/stats`, statsRoutes);
 };
 
 mountRoutes('/api');

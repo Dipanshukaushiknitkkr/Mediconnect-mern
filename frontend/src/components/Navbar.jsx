@@ -63,7 +63,7 @@ const Navbar = () => {
                   Medi<span className="text-sky-400">Connect</span>
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                  Clinical
+                  Telehealth
                 </span>
               </div>
             </div>
@@ -72,7 +72,7 @@ const Navbar = () => {
           {/* Operational Health Badge */}
           <div className="hidden lg:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-semibold text-emerald-400">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-vital-pulse" />
-            <span>Systems Online • WebRTC Active</span>
+            <span>Online • Consultations Open</span>
           </div>
         </div>
 
@@ -86,7 +86,7 @@ const Navbar = () => {
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            Specialist Directory
+            Find a Doctor
           </Link>
 
           <Link
@@ -98,7 +98,7 @@ const Navbar = () => {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-            <span>MedAI Diagnostic</span>
+            <span>AI Symptom Checker</span>
           </Link>
 
           {user && (
@@ -110,7 +110,7 @@ const Navbar = () => {
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              Workspace
+              Dashboard
             </Link>
           )}
         </nav>
@@ -141,7 +141,7 @@ const Navbar = () => {
                 <div className="hidden sm:flex flex-col text-left">
                   <span className="font-semibold text-xs text-white leading-tight">{user.name}</span>
                   <span className="text-[10px] text-slate-400 font-medium">
-                    {user.role === 'DOCTOR' ? 'Verified Physician' : user.role === 'ADMIN' ? 'Administrator' : 'Patient'}
+                    {user.role === 'DOCTOR' ? 'Doctor' : user.role === 'ADMIN' ? 'Administrator' : 'Patient'}
                   </span>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
@@ -174,7 +174,7 @@ const Navbar = () => {
                     className="flex items-center space-x-2.5 px-3 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
                   >
                     <LayoutDashboard className="w-4 h-4 text-sky-400" />
-                    <span>Clinical Dashboard</span>
+                    <span>My Dashboard</span>
                   </Link>
 
                   <button
@@ -192,7 +192,7 @@ const Navbar = () => {
               to="/login"
               className="clinical-btn-primary px-4 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5"
             >
-              <span>Sign In / Portal</span>
+              <span>Sign In</span>
             </Link>
           )}
         </div>

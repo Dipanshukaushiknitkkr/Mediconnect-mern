@@ -217,18 +217,24 @@ const BookingModal = ({ doctor, isOpen, onClose, onBookingSuccess }) => {
               </div>
             </div>
 
+            {/* Demo / Sandbox Payment Indicator */}
+            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+              <span><strong>Demo / Sandbox Mode</strong> — No real charge is made to your card.</span>
+            </div>
+
             <div className="p-3.5 rounded-xl bg-slate-900 border border-white/10 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-300 flex items-center">
                   <CreditCard className="w-3.5 h-3.5 text-emerald-400 mr-1.5" />
-                  Telehealth Payment Gateway
+                  Simulated Payment Gateway
                 </span>
-                <span className="text-[10px] bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded-md font-medium">256-Bit SSL Encrypted</span>
+                <span className="text-[10px] bg-sky-500/15 text-sky-400 px-2 py-0.5 rounded-md font-medium">Razorpay Sandbox</span>
               </div>
               <input
                 type="text"
                 disabled
-                value="•••• •••• •••• 4242 (Secure Test Card)"
+                value="•••• •••• •••• 4242 (Simulated Sandbox Card)"
                 className="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-white/5 text-xs text-slate-400 font-mono"
               />
             </div>

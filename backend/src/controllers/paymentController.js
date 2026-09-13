@@ -2,8 +2,8 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const Appointment = require('../models/Appointment');
 
-// @desc    Process appointment payment & verify signature
-// @route   POST /api/v1/payments/process
+// @desc    Process appointment payment & verify signature (Explicit Demo/Sandbox mode supported)
+// @route   POST /api/v1/payments/process & /api/payments/process
 // @access  Private
 const processPayment = async (req, res) => {
   try {
@@ -20,7 +20,10 @@ const processPayment = async (req, res) => {
         .digest('hex');
 
       if (generatedSignature !== razorpaySignature) {
-        return res.status(400).json({ success: false, message: 'Invalid payment gateway signature verification failed.' });
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid payment gateway signature verification failed.'
+        });
       }
     }
 
@@ -34,12 +37,14 @@ const processPayment = async (req, res) => {
 
       return res.json({
         success: true,
-        message: 'Payment verified and processed successfully',
+        isDemoMode: true,
+        message: 'Demo / Sandbox Mode: Simulated payment transaction — no real charge was made.',
         transaction: {
           transactionId,
           amount: apt.amount || 75,
-          paymentMethod: paymentMethod || 'Razorpay / Credit Card',
+          paymentMethod: paymentMethod || 'Razorpay Simulated Sandbox',
           status: 'SUCCESS',
+          isSimulated: true,
           timestamp: new Date()
         }
       });
@@ -56,12 +61,14 @@ const processPayment = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Payment verified and processed successfully',
+      isDemoMode: true,
+      message: 'Demo / Sandbox Mode: Simulated payment transaction — no real charge was made.',
       transaction: {
         transactionId,
         amount: appointment.amount,
-        paymentMethod: paymentMethod || 'Razorpay / Credit Card',
+        paymentMethod: paymentMethod || 'Razorpay Simulated Sandbox',
         status: 'SUCCESS',
+        isSimulated: true,
         timestamp: new Date()
       }
     });

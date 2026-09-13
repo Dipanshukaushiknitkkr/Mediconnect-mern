@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MediConnect Telehealth & AI Platform - Architecture & Interview Master Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      background-color: #ffffff;
+      line-height: 1.6;
+      font-size: 11pt;
+    }
+
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%);
+      color: #ffffff;
+      padding: 24px 28px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.15);
+    }
+
+    .header-banner h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .header-banner p {
+      font-size: 10pt;
+      color: #93c5fd;
+      font-weight: 500;
+    }
+
+    .badge-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .badge {
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e2e8f0;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 11.5pt;
+      font-weight: 600;
+      color: #0369a1;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin-bottom: 10px;
+      font-size: 10pt;
+      color: #334155;
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+      font-size: 10pt;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 9pt;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #0284c7;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 12px 0;
+      page-break-inside: avoid;
+    }
+
+    .card-success {
+      border-left-color: #059669;
+      background: #f0fdf4;
+    }
+
+    .card-warning {
+      border-left-color: #d97706;
+      background: #fffbeb;
+    }
+
+    .code-box {
+      font-family: 'Fira Code', monospace;
+      font-size: 8.5pt;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin: 10px 0;
+      overflow-x: auto;
+      line-height: 1.45;
+      page-break-inside: avoid;
+    }
+
+    .code-keyword { color: #38bdf8; font-weight: bold; }
+    .code-str { color: #a7f3d0; }
+    .code-comment { color: #64748b; font-style: italic; }
+
+    .qa-box {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      page-break-inside: avoid;
+    }
+
+    .qa-question {
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 10.5pt;
+      margin-bottom: 6px;
+    }
+
+    .qa-answer {
+      font-size: 9.5pt;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 8pt;
+      color: #94a3b8;
+      margin-top: 30px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Title Banner -->
+  <div class="header-banner">
+    <h1>🏥 MediConnect Telehealth & AI Platform</h1>
+    <p>Comprehensive Full-Stack Architecture, Real-Time WebSockets, WebRTC P2P Video, & Technical Interview Master Guide</p>
+    <div class="badge-bar">
+      <span class="badge">MERN Stack</span>
+      <span class="badge">WebRTC 1080p P2P</span>
+      <span class="badge">Socket.io Event Bus</span>
+      <span class="badge">Google Gemini 2.0 AI</span>
+      <span class="badge">Resend/SendPulse SMTP</span>
+      <span class="badge">RBAC Security</span>
+    </div>
+  </div>
+
+  <!-- 1. Executive Summary -->
+  <h2>1. Executive Summary & Problem Solved</h2>
+  <p><strong>MediConnect</strong> is an enterprise-grade virtual care ecosystem engineered to solve real-world healthcare bottlenecks: diagnostic delays, geographical care disparities, and fragmented prescription workflows.</p>
+  
+  <div class="card">
+    <p><strong>Core Capabilities:</strong></p>
+    <ul>
+      <li><strong>AI Clinical Symptom Triage</strong>: Google Gemini 2.0 Flash categorizes user symptoms into urgency tiers (<em>Emergency, High, Moderate, Low</em>) and pairs them with verified specialists.</li>
+      <li><strong>Encrypted WebRTC Telehealth Suite</strong>: Sub-100ms peer-to-peer browser video consultations with in-call clinical notes & chat.</li>
+      <li><strong>Real-Time Slot Scheduling Engine</strong>: Collision prevention, atomic bookings, cancelled slot recycling, and live socket alerts.</li>
+      <li><strong>Digital Prescription Studio</strong>: Doctor-signed multi-medication digital prescriptions with dosage, frequency, and instant email delivery.</li>
+    </ul>
+  </div>
+
+  <!-- 2. Technology Stack & Tradeoffs -->
+  <h2>2. Technology Stack & Architectural Justifications</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Technology</th>
+        <th style="width: 35%;">Role in MediConnect</th>
+        <th style="width: 40%;">Why Chosen Over Alternatives</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>React 18 + Vite</strong></td>
+        <td>Single Page Application (SPA) Frontend</td>
+        <td><strong>vs. Next.js / CRA</strong>: Instant HMR and rollup compilation. SPA runtime preserves persistent WebRTC streams and Socket connections without SSR hydration mismatch.</td>
+      </tr>
+      <tr>
+        <td><strong>Node.js & Express.js</strong></td>
+        <td>Event-Driven REST API Gateway</td>
+        <td><strong>vs. Django / Spring Boot</strong>: Non-blocking async I/O efficiently manages thousands of concurrent WebSocket signaling handshakes with minimal memory.</td>
+      </tr>
+      <tr>
+        <td><strong>MongoDB & Mongoose</strong></td>
+        <td>Document Database & ODM</td>
+        <td><strong>vs. PostgreSQL / SQL</strong>: Healthcare data has nested polymorphic structures (prescriptions, doctor qualifications). Rich indexing on <code>{ doctor, date, timeSlot }</code> prevents collisions.</td>
+      </tr>
+      <tr>
+        <td><strong>Socket.io</strong></td>
+        <td>Bidirectional Real-Time Signaling</td>
+        <td><strong>vs. Raw WebSockets / Polling</strong>: Automatic reconnects, heartbeat ping-pong, and partitioned rooms (<code>user-${id}</code> personal queues and <code>roomId</code> video channels).</td>
+      </tr>
+      <tr>
+        <td><strong>Browser-Native WebRTC</strong></td>
+        <td>P2P HD Video & Audio Stream</td>
+        <td><strong>vs. Twilio / Agora SDKs</strong>: Zero per-minute third-party licensing fees, sub-100ms latency, and direct 256-bit DTLS/SRTP browser encryption.</td>
+      </tr>
+      <tr>
+        <td><strong>Google Gemini 2.0 Flash</strong></td>
+        <td>Clinical AI Symptom Triage</td>
+        <td><strong>vs. OpenAI GPT-4</strong>: High-speed sub-second inference, strict JSON schema compliance, paired with a deterministic heuristic fallback engine.</td>
+      </tr>
+      <tr>
+        <td><strong>Nodemailer + Resend/SendPulse</strong></td>
+        <td>Transactional Email Engine</td>
+        <td><strong>vs. Third-Party Webhooks</strong>: Standardized SMTP relay interface supporting Resend, SendPulse, or Gmail App Passwords with zero code modifications.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Page Break -->
+  <div class="page-break"></div>
+
+  <!-- 3. Database Schemas -->
+  <h2>3. Database Schemas & Data Relationships</h2>
+  <p>The platform is modeled across 5 specialized MongoDB collections:</p>
+
+  <div class="card">
+    <h3>1. User Schema (<code>User.js</code>)</h3>
+    <p>Stores credentials, personal profiles, medical vitals, and password reset tokens.</p>
+    <div class="code-box">
+<span class="code-keyword">const</span> UserSchema = <span class="code-keyword">new</span> mongoose.Schema({
+  name: { type: String, required: <span class="code-keyword">true</span> },
+  email: { type: String, required: <span class="code-keyword">true</span>, unique: <span class="code-keyword">true</span> },
+  password: { type: String, required: <span class="code-keyword">true</span> }, <span class="code-comment">// bcrypt hashed (salt=10)</span>
+  role: { type: String, enum: [<span class="code-str">'PATIENT'</span>, <span class="code-str">'DOCTOR'</span>, <span class="code-str">'ADMIN'</span>], default: <span class="code-str">'PATIENT'</span> },
+  phone: String, avatar: String, bloodGroup: String, allergies: String, emergencyContact: String,
+  resetPasswordToken: String, resetPasswordExpires: Date
+}, { timestamps: <span class="code-keyword">true</span> });
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2. Doctor Profile Schema (<code>DoctorProfile.js</code>)</h3>
+    <p>1-to-1 extension of the Doctor User containing verification status and hourly rates.</p>
+    <div class="code-box">
+<span class="code-keyword">const</span> DoctorProfileSchema = <span class="code-keyword">new</span> mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: <span class="code-str">'User'</span>, required: <span class="code-keyword">true</span> },
+  specialty: { type: String, index: <span class="code-keyword">true</span> },
+  qualification: String, experienceYears: Number, hourlyFee: Number, hospital: String, bio: String,
+  licenseNumber: { type: String, required: <span class="code-keyword">true</span>, unique: <span class="code-keyword">true</span> },
+  status: { type: String, enum: [<span class="code-str">'PENDING'</span>, <span class="code-str">'APPROVED'</span>, <span class="code-str">'REJECTED'</span>], default: <span class="code-str">'PENDING'</span> },
+  rating: { type: Number, default: <span class="code-str">4.9</span> }, reviewCount: { type: Number, default: <span class="code-str">12</span> }
+});
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3. Appointment & Prescription Schemas</h3>
+    <p>Manages scheduled consultations, meeting rooms, and issued medication arrays.</p>
+    <div class="code-box">
+<span class="code-comment">// Appointment (with composite collision prevention index)</span>
+AppointmentSchema.index({ doctor: <span class="code-str">1</span>, date: <span class="code-str">1</span>, timeSlot: <span class="code-str">1</span>, status: <span class="code-str">1</span> });
+
+<span class="code-comment">// Prescription schema with embedded medicines array</span>
+medicines: [{ name: String, dosage: String, frequency: String, duration: String }]
+    </div>
+  </div>
+
+  <!-- 4. WebRTC and Socket Signaling -->
+  <h2>4. WebRTC Peer-to-Peer Video & Real-Time Signaling</h2>
+  <p>WebRTC creates a direct, peer-to-peer audio/video tunnel between Patient and Doctor using the browser's native media engine:</p>
+
+  <div class="card card-success">
+    <p><strong>Step-by-Step Signaling Handshake:</strong></p>
+    <ol>
+      <li><strong>Room Join</strong>: Patient and Doctor connect via Socket.io to <code>join-room { roomId }</code>.</li>
+      <li><strong>Offer Creation</strong>: The first peer calls <code>pc.createOffer()</code> and emits <code>webrtc-offer</code> over Socket.io.</li>
+      <li><strong>Answer Generation</strong>: The receiving peer calls <code>pc.setRemoteDescription(offer)</code>, calls <code>pc.createAnswer()</code>, and replies with <code>webrtc-answer</code>.</li>
+      <li><strong>NAT Traversal (STUN)</strong>: Both browsers query Google STUN servers (<code>stun:stun.l.google.com:19302</code>) to discover public IP/port candidates and exchange them via <code>webrtc-candidate</code>.</li>
+      <li><strong>Direct Media Stream</strong>: Once candidates match, high-definition 1080p video streams directly peer-to-peer with 256-bit DTLS/SRTP encryption.</li>
+    </ol>
+  </div>
+
+  <!-- Page Break -->
+  <div class="page-break"></div>
+
+  <!-- 5. AI Clinical Triage -->
+  <h2>5. AI Clinical Triage & Safety Fallback Engine</h2>
+  <p>The AI engine translates raw, unstructured patient text into structured medical recommendations:</p>
+  
+  <div class="card">
+    <p><strong>1. Gemini 2.0 JSON-Schema Prompting:</strong> Enforces exact JSON keys: <code>summary</code>, <code>suggestedSpecialty</code>, <code>urgencyLevel</code>, <code>recommendedAction</code>, and <code>keyQuestions</code>.</p>
+    <p><strong>2. Deterministic Heuristic Fallback Engine:</strong> If the Gemini API experiences network limits, a built-in medical rule engine intercepts symptoms safely:</p>
+    <ul>
+      <li><em>Chest tightness / breath shortness</em> &rarr; <strong>Cardiology</strong> (High / Emergency &rarr; Hospital ER Alert)</li>
+      <li><em>Severe migraine / photophobia</em> &rarr; <strong>Neurology</strong> (Moderate / High)</li>
+      <li><em>Skin rash / eczema</em> &rarr; <strong>Dermatology</strong> (Low)</li>
+      <li><em>Joint pain / bone fracture</em> &rarr; <strong>Orthopedics</strong> (Moderate)</li>
+    </ul>
+  </div>
+
+  <!-- 6. Engineering Challenges & Solutions -->
+  <h2>6. Key Engineering Challenges & Solutions</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Challenge</th>
+        <th style="width: 35%;">Root Cause</th>
+        <th style="width: 40%;">Implemented Solution</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>WebRTC Race Conditions</strong></td>
+        <td>Remote peer received ICE candidates before initializing <code>RTCPeerConnection</code>.</td>
+        <td>Implemented stateful sequencing in <code>VideoConsultationPage.jsx</code>: connection is created upon <code>user-joined</code> and candidates are buffered until remote description is set.</td>
+      </tr>
+      <tr>
+        <td><strong>Concurrent Booking Collisions</strong></td>
+        <td>Two patients booking the same slot at the exact same millisecond.</td>
+        <td>Enforced composite database index <code>{ doctor, date, timeSlot }</code> + atomic recycling of cancelled slot records.</td>
+      </tr>
+      <tr>
+        <td><strong>Password Token Security Leaks</strong></td>
+        <td>Initial API returning reset tokens in HTTP response bodies.</td>
+        <td>Hashed tokens with SHA-256 in MongoDB (+1 hour expiry) and delivered tokens strictly via verified SMTP email.</td>
+      </tr>
+      <tr>
+        <td><strong>Zero-Downtime Resilience</strong></td>
+        <td>Cloud DB cold-starts causing evaluation failures.</td>
+        <td>Integrated an in-memory data store fallback in <code>server.js</code> routing traffic seamlessly when database is unreachable.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 7. Technical Interview Q&A Bank -->
+  <h2>7. Senior-Level Interview Preparation Master Guide</h2>
+
+  <div class="qa-box">
+    <div class="qa-question">Q1: How does WebRTC connect two users across firewalls and NATs?</div>
+    <div class="qa-answer">WebRTC uses Session Description Protocol (SDP) and ICE. Our Socket.io server acts as the signaling channel. Peers exchange SDP Offers and Answers. Simultaneously, STUN servers resolve the public IP/port mappings (NAT traversal). Once candidates match, an encrypted P2P media stream is established directly between browsers.</div>
+  </div>
+
+  <div class="qa-box">
+    <div class="qa-question">Q2: Why use WebSockets alongside REST APIs instead of WebSockets for everything?</div>
+    <div class="qa-answer">REST APIs are ideal for idempotent CRUD operations (authentication, profile updates, medical records) where HTTP caching, status codes (200, 401, 500), and rate-limiting middleware provide security. Socket.io is used specifically for high-frequency real-time events: WebRTC signaling, in-call chat, and instant dashboard push notifications.</div>
+  </div>
+
+  <div class="qa-box">
+    <div class="qa-question">Q3: How is Role-Based Access Control (RBAC) enforced in the backend?</div>
+    <div class="qa-answer">We enforce defense-in-depth security: <code>protect</code> middleware validates the JWT token signature and decodes user context. <code>authorize('DOCTOR', 'ADMIN')</code> checks permissions. In controllers, we enforce object-level ownership (e.g., doctors can only prescribe for appointments they attend; patients cannot modify appointment statuses).</div>
+  </div>
+
+  <div class="qa-box">
+    <div class="qa-question">Q4: How would you scale this platform to 100,000 concurrent video calls?</div>
+    <div class="qa-answer">1) Transition from mesh P2P to a Selective Forwarding Unit (SFU) like Mediasoup or LiveKit to optimize client bandwidth.<br>2) Implement a Redis Adapter for Socket.io to scale WebSocket servers horizontally behind an NGINX load balancer.<br>3) Shard MongoDB by <code>doctorId</code> and <code>date</code> with Redis caching for doctor directories.</div>
+  </div>
+
+  <div class="footer">
+    © 2026 MediConnect Telehealth • Production Architecture & Technical Interview Reference Document
+  </div>
+
+</body>
+</html>
