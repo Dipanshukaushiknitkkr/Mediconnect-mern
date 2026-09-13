@@ -7,10 +7,10 @@ import {
   UserCheck,
   ArrowRight,
   Loader2,
-  Stethoscope,
-  AlertTriangle,
-  FileCheck2,
-  HelpCircle
+  AlertCircle,
+  HelpCircle,
+  Bot,
+  User
 } from 'lucide-react';
 
 const MedAIPage = () => {
@@ -19,13 +19,22 @@ const MedAIPage = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [bookingDoctor, setBookingDoctor] = useState(null);
+  const [selectedBodyArea, setSelectedBodyArea] = useState(null);
 
-  const quickPrompts = [
-    "Severe throbbing migraine with light sensitivity for 2 days",
-    "Chest tightness and mild shortness of breath during light exertion",
-    "Persistent dry cough, fever spikes, and general body fatigue",
-    "Pruritic erythematous rash spreading across arms and back"
+  // Tappable body-area chips with plain-language symptom templates
+  const bodyAreaChips = [
+    { name: 'Head', example: 'I have had a severe throbbing headache with light sensitivity since yesterday.' },
+    { name: 'Chest', example: 'I have mild chest tightness and shortness of breath during light physical exertion.' },
+    { name: 'Stomach', example: 'I have sudden stomach cramping, nausea, and indigestion after eating.' },
+    { name: 'Skin', example: 'I have a bad rash on my arm that itches like crazy and feels warm.' },
+    { name: 'Joints', example: 'My knees and lower back feel stiff and ache whenever I stand up.' },
+    { name: 'Mood', example: 'I have had constant fatigue, sleep trouble, and elevated stress this past week.' }
   ];
+
+  const handleChipClick = (chip) => {
+    setSelectedBodyArea(chip.name);
+    setSymptoms(chip.example);
+  };
 
   const handleTriage = async (e) => {
     if (e) e.preventDefault();
@@ -45,128 +54,171 @@ const MedAIPage = () => {
     }
   };
 
-  const getUrgencyColor = (level) => {
+  const getUrgencyBadge = (level) => {
     switch (level) {
-      case 'Emergency': return 'bg-red-500/15 text-red-400 border-red-500/30';
-      case 'High': return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
-      case 'Moderate': return 'bg-sky-500/15 text-sky-300 border-sky-500/30';
-      default: return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+      case 'Emergency': return 'bg-[#C4501F]/15 text-[#C4501F] border border-[#C4501F]/30';
+      case 'High': return 'bg-[#C4501F]/10 text-[#C4501F] border border-[#C4501F]/20';
+      case 'Moderate': return 'bg-[#F2E9DA] text-[#1F4D3D] border border-[#1F4D3D]/20';
+      default: return 'bg-[#DCEAE1] text-[#1F4D3D] border border-[#1F4D3D]/30';
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
-      {/* MedAI Hero Header */}
-      <div className="clinical-card p-8 rounded-2xl text-center space-y-3 relative overflow-hidden border border-white/5">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs font-semibold">
-          <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-          <span>Clinical Symptom Triage Engine</span>
-        </div>
-
-        <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
-          MedAI Diagnostic & Specialist Matching
+      {/* Page Header */}
+      <div className="text-center space-y-2 max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#1C2B24]">
+          AI Symptom Triage & Care Matching
         </h1>
-
-        <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-          Provide your current symptoms to receive instant medical specialization recommendations, urgency triage scoring, and matching accredited physician slots.
+        <p className="text-sm text-[#53655D] leading-relaxed">
+          Describe what you are feeling in your own words. Our clinical intake assistant helps evaluate your symptoms and connects you with the right specialist.
         </p>
       </div>
 
-      {/* Input Form Card */}
-      <div className="clinical-card p-6 sm:p-7 rounded-2xl space-y-5 border border-white/5 shadow-md">
-        <form onSubmit={handleTriage} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Describe your health condition & clinical symptoms:
-            </label>
-            <textarea
-              rows={4}
-              value={symptoms}
-              onChange={(e) => setSymptoms(e.target.value)}
-              placeholder="e.g., I have had a continuous throbbing headache, mild photophobia, and slight nausea since yesterday after working long hours..."
-              className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 text-xs sm:text-sm transition-colors"
-            />
-          </div>
-
-          {/* Quick Example Prompts */}
-          <div>
-            <p className="text-xs text-slate-400 mb-1.5 font-medium">Or select a standard clinical symptom prompt:</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {quickPrompts.map((prompt, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setSymptoms(prompt)}
-                  className="text-xs px-3 py-2 rounded-lg bg-slate-900/80 hover:bg-slate-850 text-slate-300 border border-white/5 transition-colors text-left"
-                >
-                  "{prompt}"
-                </button>
-              ))}
+      {/* Conversational Chat & Input Container */}
+      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8DFD3] shadow-sm space-y-6">
+        
+        {/* Conversational Message Bubbles */}
+        <div className="space-y-4 pb-4 border-b border-[#E8DFD3]">
+          
+          {/* 1. Bot Intro Bubble */}
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 rounded-lg bg-[#1F4D3D] text-white flex items-center justify-center shrink-0 mt-0.5">
+              <Bot className="w-4 h-4 text-[#FBF6EF]" />
+            </div>
+            <div className="bg-[#DCEAE1] text-[#1C2B24] p-4 rounded-2xl rounded-tl-sm text-sm leading-relaxed max-w-lg">
+              <p className="font-semibold text-xs text-[#1F4D3D] mb-1">MedAI Assistant</p>
+              <p>Hello! I am your virtual clinical intake assistant. What symptoms or health concerns are you experiencing today?</p>
             </div>
           </div>
 
-          {error && <p className="text-xs text-red-400 font-semibold">{error}</p>}
+          {/* 2. Example User Query Bubble */}
+          <div className="flex items-start justify-end space-x-3">
+            <div className="bg-[#F2E9DA] text-[#1C2B24] p-4 rounded-2xl rounded-tr-sm text-sm leading-relaxed max-w-lg text-left">
+              <p className="font-semibold text-xs text-[#C4501F] mb-1">Patient Example</p>
+              <p>"I have a bad rash on my arm that itches like crazy and feels warm to the touch."</p>
+            </div>
+            <div className="w-8 h-8 rounded-lg bg-[#F2E9DA] text-[#1F4D3D] flex items-center justify-center shrink-0 mt-0.5 border border-[#E8DFD3]">
+              <User className="w-4 h-4 text-[#1F4D3D]" />
+            </div>
+          </div>
+
+          {/* 3. Follow-up Bot Guidance Bubble */}
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 rounded-lg bg-[#1F4D3D] text-white flex items-center justify-center shrink-0 mt-0.5">
+              <Bot className="w-4 h-4 text-[#FBF6EF]" />
+            </div>
+            <div className="bg-[#DCEAE1] text-[#1C2B24] p-3.5 rounded-2xl rounded-tl-sm text-xs sm:text-sm leading-relaxed max-w-lg">
+              <p className="text-[#53655D]">You can select a body area below or type your symptoms directly into the box.</p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Tappable Body-Area Quick-Entry Chips */}
+        <div>
+          <label className="block text-xs font-semibold text-[#53655D] mb-2 uppercase tracking-wider">
+            Quick Entry: Select Affected Area
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {bodyAreaChips.map((chip) => {
+              const isSelected = selectedBodyArea === chip.name;
+              return (
+                <button
+                  key={chip.name}
+                  type="button"
+                  onClick={() => handleChipClick(chip)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-medium border transition-colors ${
+                    isSelected
+                      ? 'bg-[#1F4D3D] text-white border-[#1F4D3D]'
+                      : 'bg-[#FBF6EF] text-[#1C2B24] border-[#E8DFD3] hover:border-[#1F4D3D]/40'
+                  }`}
+                >
+                  {chip.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* User Input Form */}
+        <form onSubmit={handleTriage} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-[#1C2B24] mb-1.5">
+              Describe your symptoms:
+            </label>
+            <textarea
+              rows={3}
+              value={symptoms}
+              onChange={(e) => setSymptoms(e.target.value)}
+              placeholder="e.g., I've had a bad cough and mild fever for the past 2 days..."
+              className="w-full px-4 py-3 rounded-xl bg-white border border-[#E8DFD3] text-[#1C2B24] placeholder-[#7B8D85] focus:outline-none focus:border-[#1F4D3D] focus:ring-1 focus:ring-[#1F4D3D] text-sm"
+            />
+          </div>
+
+          {error && <p className="text-xs text-[#C4501F] font-semibold">{error}</p>}
 
           <button
             type="submit"
             disabled={loading || !symptoms.trim()}
-            className="w-full py-3 rounded-xl clinical-btn-primary font-semibold text-white text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl btn-cta-primary font-semibold text-white text-sm flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50"
           >
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>MedAI is Analyzing Clinical Symptoms...</span>
+                <span>Evaluating symptoms...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-sky-200" />
-                <span>Evaluate Symptoms & Match Specialist</span>
+                <Sparkles className="w-4 h-4 text-white" />
+                <span>Evaluate Symptoms & Match Doctor</span>
               </>
             )}
           </button>
         </form>
+
       </div>
 
       {/* AI Triage Results Section */}
       {result && (
         <div className="space-y-6">
-          <div className="clinical-card p-6 sm:p-7 rounded-2xl border border-sky-500/30 space-y-5 shadow-lg">
+          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-[#E8DFD3] space-y-5 shadow-sm">
             
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-white/10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-[#E8DFD3]">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Recommended Specialization</span>
-                <span className="text-lg font-bold text-sky-400">{result.triage.suggestedSpecialty}</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#7B8D85] block mb-0.5">Recommended Specialty</span>
+                <span className="text-lg font-bold text-[#1F4D3D]">{result.triage.suggestedSpecialty}</span>
               </div>
 
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Triage Severity</span>
-                <span className={`px-3 py-1 rounded-md text-xs font-bold border ${getUrgencyColor(result.triage.urgencyLevel)}`}>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#7B8D85] block mb-0.5">Urgency Level</span>
+                <span className={`px-3 py-1 rounded-md text-xs font-bold ${getUrgencyBadge(result.triage.urgencyLevel)}`}>
                   {result.triage.urgencyLevel} Priority
                 </span>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-1.5">
-              <span className="text-xs font-semibold text-sky-300 uppercase block tracking-wider">Clinical Summary</span>
-              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">{result.triage.summary}</p>
+            <div className="p-4 rounded-xl bg-[#FBF6EF] border border-[#E8DFD3] space-y-1">
+              <span className="text-xs font-semibold text-[#1F4D3D] uppercase block tracking-wider">Clinical Assessment</span>
+              <p className="text-xs sm:text-sm text-[#1C2B24] leading-relaxed">{result.triage.summary}</p>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-start space-x-2.5">
-              <ShieldCheck className="w-5 h-5 text-sky-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-xl bg-[#DCEAE1] border border-[#1F4D3D]/20 flex items-start space-x-2.5">
+              <ShieldCheck className="w-5 h-5 text-[#1F4D3D] shrink-0 mt-0.5" />
               <div>
-                <span className="text-xs font-semibold text-sky-300 uppercase block mb-0.5 tracking-wider">Recommended Next Step</span>
-                <p className="text-xs text-sky-200 leading-relaxed">{result.triage.recommendedAction}</p>
+                <span className="text-xs font-semibold text-[#1F4D3D] uppercase block mb-0.5 tracking-wider">Recommended Next Step</span>
+                <p className="text-xs sm:text-sm text-[#1C2B24] leading-relaxed">{result.triage.recommendedAction}</p>
               </div>
             </div>
 
             {result.triage.keyQuestions && result.triage.keyQuestions.length > 0 && (
-              <div className="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center">
-                  <HelpCircle className="w-3.5 h-3.5 mr-1.5 text-sky-400" />
-                  Key Diagnostic Inquiries
+              <div className="p-4 rounded-xl bg-[#FBF6EF] border border-[#E8DFD3] space-y-2">
+                <span className="text-xs font-semibold text-[#53655D] uppercase tracking-wider flex items-center">
+                  <HelpCircle className="w-3.5 h-3.5 mr-1.5 text-[#1F4D3D]" />
+                  Questions to Prepare for Your Doctor
                 </span>
-                <ul className="list-disc list-inside space-y-1 text-xs text-slate-300">
+                <ul className="list-disc list-inside space-y-1 text-xs text-[#1C2B24]">
                   {result.triage.keyQuestions.map((q, idx) => (
                     <li key={idx}>{q}</li>
                   ))}
@@ -178,37 +230,37 @@ const MedAIPage = () => {
 
           {/* Recommended Specialists List */}
           {result.recommendedDoctors && result.recommendedDoctors.length > 0 && (
-            <div className="space-y-3.5">
-              <h3 className="text-base font-bold text-white flex items-center space-x-2">
-                <UserCheck className="w-4 h-4 text-emerald-400" />
-                <span>Matching Verified Physicians:</span>
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold font-serif text-[#1C2B24] flex items-center space-x-2">
+                <UserCheck className="w-5 h-5 text-[#1F4D3D]" />
+                <span>Matching Verified Doctors:</span>
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {result.recommendedDoctors.map((doc) => (
                   <div
                     key={doc._id}
-                    className="clinical-card p-4 rounded-xl flex items-center justify-between hover:border-sky-500/40 transition-colors border border-white/5"
+                    className="bg-white p-5 rounded-xl flex items-center justify-between border border-[#E8DFD3] shadow-sm hover:border-[#1F4D3D]/30 transition-colors"
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3.5">
                       <img
-                        src={doc.user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Doctor'}
+                        src={doc.user?.avatar || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=200'}
                         alt={doc.user?.name}
-                        className="w-12 h-12 rounded-xl object-cover ring-1 ring-sky-500/30"
+                        className="w-12 h-12 rounded-xl object-cover border border-[#E8DFD3]"
                       />
                       <div>
-                        <h5 className="font-bold text-white text-xs sm:text-sm">{doc.user?.name}</h5>
-                        <p className="text-xs text-sky-400">{doc.specialty} • {doc.experienceYears} Yrs Exp.</p>
-                        <p className="text-[11px] text-slate-400 tabular-nums">${doc.hourlyFee} / session</p>
+                        <h5 className="font-bold text-[#1C2B24] text-sm">{doc.user?.name}</h5>
+                        <p className="text-xs text-[#53655D]">{doc.specialty} • {doc.experienceYears || 10} yrs exp</p>
+                        <p className="text-xs font-semibold text-[#1C2B24] mt-0.5 tabular-nums">${doc.hourlyFee || 85} / visit</p>
                       </div>
                     </div>
 
                     <button
                       onClick={() => setBookingDoctor(doc)}
-                      className="px-3.5 py-1.5 rounded-lg clinical-btn-primary text-xs font-semibold flex items-center space-x-1 shadow-sm"
+                      className="btn-cta-primary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1 shadow-sm"
                     >
-                      <span>Book Slot</span>
-                      <ArrowRight className="w-3 h-3" />
+                      <span>Book</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
@@ -228,8 +280,8 @@ const MedAIPage = () => {
       )}
 
       {/* Clinical Disclaimer */}
-      <div className="text-center p-3.5 clinical-card rounded-xl border border-white/5 text-[11px] text-slate-400">
-        <p>⚡ Powered by <strong className="text-sky-300">MedAI Clinical Triage</strong>. For life-threatening emergencies, dial emergency services immediately.</p>
+      <div className="text-center p-3.5 bg-white rounded-xl border border-[#E8DFD3] text-xs text-[#53655D]">
+        <p>MedAI provides clinical guidance and triage assistance. For medical emergencies, please dial your local emergency services immediately.</p>
       </div>
 
     </div>
